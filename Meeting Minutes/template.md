@@ -17,7 +17,7 @@ No one
 
 ## **Updates**
 
-| Person | Updates |
+| **Person** | **Updates** |
 | :--- | :--- |
 | Billy | |
 | Brandon | |
@@ -25,7 +25,7 @@ No one
 
 ## **Minutes / Action Items**
 
-| Issue | Action Items |
+| **Issue** | **Action Items** |
 | :--- | :--- | 
 |  |  |
 |  |  |
