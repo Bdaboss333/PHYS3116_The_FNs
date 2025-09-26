@@ -29,3 +29,14 @@ ax = plt.axes(projection='3d')
 ax.plot3D(harris_x,harris_y,harris_z,'o')
 ax.view_init(elev=30,azim=0,roll=0)
 plt.show()
+
+# Scatter plot of the age vs metallicity from Krause 21 cluster data
+FeH_k = krause['FeH']
+Age_k = krause['Age']
+
+plt.scatter(Age_k, FeH_k)
+plt.xlabel("Age of Krause Clusters")
+plt.ylabel("Metallicity of Krause Clusters")
+plt.title("Age vs Metallicity of the Krause Globular Clusters")
+plt.show()
+
