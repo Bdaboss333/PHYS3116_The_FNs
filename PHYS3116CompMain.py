@@ -30,11 +30,17 @@ ax.plot3D(harris_x,harris_y,harris_z,'o')
 ax.view_init(elev=30,azim=0,roll=0)
 plt.show()
 
-# Scatter plot of the age vs metallicity from Krause 21 cluster data
+# Scatter plot of the age vs metallicity from Krause 21 cluster data #
 FeH_k = krause['FeH']
 Age_k = krause['Age']
+ID_k = krause['Object']
 
-plt.scatter(Age_k, FeH_k)
+# Added a colourmap to visualize how the GC colours would change with age #
+plt.scatter(Age_k, FeH_k, c = Age_k, cmap = 'coolwarm')
+
+# This adds labels to each of the points on the plot just to clarify what point is what GC #
+for i, txt in enumerate(ID_k):
+    plt.annotate(txt, (Age_k[i], FeH_k[i]))
 plt.xlabel("Age of Krause Clusters")
 plt.ylabel("Metallicity of Krause Clusters")
 plt.title("Age vs Metallicity of the Krause Globular Clusters")
