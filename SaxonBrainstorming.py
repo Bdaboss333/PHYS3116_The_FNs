@@ -9,15 +9,15 @@ vandenberg = pd.read_csv('vandenBerg_table2_fixed.csv')
 
 
 # Attempting to merge the Krause21 and Vandenberg data to make plotting easier (there are a few issues with how the tables merge as it removes all unique GC's that are present in Vandenberg but not Krause21) # 
-merged = pd.merge(krause, vandenberg, on='ID', how='left')
+merged = pd.merge(krause, vandenberg, on='ID', how='outer')
 print(merged)
 
 # This is a merged data set of the dynamical data featured in HarrisI & HarrisIII (no merging issues here since both data sets have the same GC's) #
-merged2 = pd.merge(harris_p1, harris_p3, on='ID', how='inner')
+merged2 = pd.merge(harris_p1, harris_p3, on='ID', how='outer')
 print(merged2)
 
 # This merged data set contains every Harris GC but also gives the common GC's the chemical/age data from the other data sets (still a bit iffy since the original merged set may have cut out some unique GC's from the Vendenberg data set) #
-totmerge = pd.merge(merged2, merged, on='ID', how='left')
+totmerge = pd.merge(merged2, merged, on='ID', how='outer')
 print(totmerge)
 
 # This merged data set contains only the GC's that have both dynamical data and chemical/age data (still ironing out some issues) #
