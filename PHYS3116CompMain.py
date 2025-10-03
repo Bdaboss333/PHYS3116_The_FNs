@@ -40,9 +40,9 @@ plt.scatter(Age_k, FeH_k, c = Age_k, cmap = 'coolwarm')
 
 # This adds labels to each of the points on the plot just to clarify what point is what GC #
 for i, txt in enumerate(ID_k):
-    plt.annotate(txt, (Age_k[i], FeH_k[i]))
-plt.xlabel("Age of Krause Clusters")
-plt.ylabel("Metallicity of Krause Clusters")
+    plt.annotate(txt, (Age_k[i], FeH_k[i]), fontsize=8)
+plt.xlabel("Age of Krause Clusters (Gyr)")
+plt.ylabel("Metallicity of Krause Clusters (FeH)")
 plt.title("Age vs Metallicity of the Krause Globular Clusters")
 plt.show()
 
@@ -56,9 +56,24 @@ plt.scatter(Age_v, FeH_v, c = Age_v, cmap = 'coolwarm')
 
 # This adds labels to each of the points on the plot just to clarify what point is what GC #
 for i, txt in enumerate(ID_v):
-    plt.annotate(txt, (Age_v[i], FeH_v[i]))
-plt.xlabel("Age of VanderBerg Clusters")
-plt.ylabel("Metallicity of VanderBerg Clusters")
+    plt.annotate(txt, (Age_v[i], FeH_v[i]), fontsize=8)
+plt.xlabel("Age of VanderBerg Clusters (Gyr)")
+plt.ylabel("Metallicity of VanderBerg Clusters (FeH)")
 plt.title("Age vs Metallicity of the VanderBerg Globular Clusters")
+plt.show()
+
+# Scatter plot of the cluster core radius vs the velocity distribution #
+r_c = harris_p3['r_c']
+sig_v = harris_p3['sig_v']
+ID_h = harris_p1['ID']
+
+plt.scatter(r_c, sig_v)
+
+# This adds labels to each of the points on the plot just to clarify what point is what GC #
+for i, txt in enumerate(ID_h):
+    plt.annotate(txt, (r_c[i], sig_v[i]), fontsize=8)
+plt.xlabel("Core Radius (arcmin)")
+plt.ylabel("Velocity Dispersion (km/s)")
+plt.title("Core Radius vs Velocity Distribution")
 plt.show()
 
