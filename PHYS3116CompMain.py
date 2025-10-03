@@ -78,3 +78,11 @@ plt.ylabel("Velocity Dispersion (km/s)")
 plt.title("Core Radius vs Velocity Distribution")
 plt.show()
 
+# Trying out a histrogram plot to see any sort of bimodal relationship
+feh = vandenberg['FeH']
+
+plt.hist(feh, bins=15, edgecolor='black')
+plt.xlabel("[Fe/H]")
+plt.ylabel("Number of Clusters")
+plt.title("Bimodal Metallicity Distribution of Globular Clusters")
+plt.show()
