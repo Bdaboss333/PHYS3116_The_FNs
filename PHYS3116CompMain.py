@@ -62,11 +62,12 @@ plt.ylabel("Metallicity of VanderBerg Clusters (FeH)")
 plt.title("Age vs Metallicity of the VanderBerg Globular Clusters")
 plt.show()
 
-# Scatter plot of the cluster core radius vs the velocity distribution #
+# Defining Harris Variables #
 r_c = harris_p3['r_c']
 sig_v = harris_p3['sig_v']
 ID_h = harris_p1['ID']
 
+# Scatter plot of the cluster core radius vs the velocity distribution #
 plt.scatter(r_c, sig_v)
 
 # This adds labels to each of the points on the plot just to clarify what point is what GC #
