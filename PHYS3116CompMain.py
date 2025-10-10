@@ -90,7 +90,7 @@ plt.show()
 
 # Gonna try add colour to the 3D plot to distinguish between accreted and in-situ GC's
 
-# 3D plot of all GC's with metalicity < -1.3 and > -1.3
+# 3D plot of all GC's with metallicity < -1.3 and > -1.3
 x_coord = totmerge2['X'][totmerge2['FeH_x']<-1.3]
 y_coord = totmerge2['Y'][totmerge2['FeH_x']<-1.3]
 z_coord= totmerge2['Z'][totmerge2['FeH_x']<-1.3]
