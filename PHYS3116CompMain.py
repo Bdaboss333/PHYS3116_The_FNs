@@ -13,6 +13,7 @@ harris_p1 = pd.read_csv('HarrisPartI.csv')
 harris_p3 = pd.read_csv('HarrisPartIII.csv')
 krause = pd.read_csv('Krause21.csv')
 vandenberg = pd.read_csv('vandenBerg_table2.csv')
+totmerge2 = pd.read_csv('totmerge2.csv')
 
 # Krause21 and vandenBerg_table2 will be primarily used for their age and metallicity
 # HarrisPartI and PartIII will be used for their dynamics data
