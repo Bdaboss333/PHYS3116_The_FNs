@@ -1,6 +1,7 @@
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
+import csv
 
 harris_p1 = pd.read_csv('HarrisPartI.csv')
 harris_p3 = pd.read_csv('HarrisPartIII.csv')
@@ -46,3 +47,12 @@ plt.show()
 
 # Even though NGC5139 does not have chemical/age data, the fact that it is such a major outlier in the dynamical data gives me strong belief that its accreted #
 # Added colourbars and stuff to experiment with how to better condense our data
+
+# Turned both of the merged data sets into .csv files to use in the main file #
+df = pd.DataFrame(totmerge)
+
+df.to_csv('totmerge.csv', index=False)
+
+df = pd.DataFrame(totmerge2)
+
+df.to_csv('totmerge2.csv', index=False)
