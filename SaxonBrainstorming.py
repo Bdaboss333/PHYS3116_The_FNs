@@ -25,19 +25,24 @@ totmerge2 = pd.merge(merged, merged2, on='ID', how='left')
 print(totmerge2)
 
 # Defining Merged Variables #
+# Also defined the age_x colomn for the colourbar, need to find out how to merge this with age_y to get a better representation #
 r_c = totmerge2['r_c']
 sig_v = totmerge2['sig_v']
 ID_h = totmerge2['ID']
+Age_v = totmerge2['Age_y']
 
 # Scatter plot of the cluster core radius vs the velocity distribution #
-plt.scatter(r_c, sig_v)
+# Added a colourmap and colour index to the scatterplot #
+scatter= plt.scatter(r_c, sig_v, c=Age_v, cmap='coolwarm')
 
 # This adds labels to each of the points on the plot just to clarify what point is what GC (i have noticed that for the GC's with chemical/age data NGC5139 does not appear, will have to determine if its accreted through other means) #
 for i, txt in enumerate(ID_h):
     plt.annotate(txt, (r_c[i], sig_v[i]), fontsize=8)
+plt.colorbar(scatter, label='Age')
 plt.xlabel("Core Radius (arcmin)")
 plt.ylabel("Velocity Dispersion (km/s)")
 plt.title("Core Radius vs Velocity Distribution")
 plt.show()
 
 # Even though NGC5139 does not have chemical/age data, the fact that it is such a major outlier in the dynamical data gives me strong belief that its accreted #
+# Added colourbars and stuff to experiment with how to better condense our data
