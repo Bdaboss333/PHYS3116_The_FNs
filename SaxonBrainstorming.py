@@ -48,11 +48,13 @@ plt.show()
 # Even though NGC5139 does not have chemical/age data, the fact that it is such a major outlier in the dynamical data gives me strong belief that its accreted #
 # Added colourbars and stuff to experiment with how to better condense our data
 
-# Turned both of the merged data sets into .csv files to use in the main file #
-df = pd.DataFrame(totmerge)
-
-df.to_csv('totmerge.csv', index=False)
-
-df = pd.DataFrame(totmerge2)
-
-df.to_csv('totmerge2.csv', index=False)
+# Made a plot of Galacticentric radius vs absolute height above the plane of the galaxy, as most of the in situ globular clusters are of decently similar distance, the accreted clusters should be pretty apparent #
+ID=harris_p1['ID']
+R_gc=harris_p1['R_gc']
+Z=harris_p1['Z']
+plt.scatter(R_gc, abs(Z))
+for i, txt in enumerate(ID):
+    plt.annotate(txt, (R_gc[i], abs(Z[i])), fontsize=8)
+plt.xlabel("Galactocentric Radius ()")
+plt.ylabel("Height from Plane ()")
+plt.show()
