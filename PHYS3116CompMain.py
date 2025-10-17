@@ -24,10 +24,16 @@ totmerge2 = pd.read_csv('totmerge2.csv')
 harris_x = harris_p1['X']
 harris_y = harris_p1['Y']
 harris_z = harris_p1['Z']
+ID_h = harris_p1['ID']
 
 plt.figure(1)
 ax = plt.axes(projection='3d')
 ax.plot3D(harris_x,harris_y,harris_z,'o')
+for i in range(len(ID_h)):
+    ax.text(harris_x[i], harris_y[i], harris_z[i], ID_h [i], color='black', fontsize=8)
+ax.set_xlabel('X (kpc)')
+ax.set_ylabel('Y (kpc)')
+ax.set_zlabel('Z (kpc)')
 ax.view_init(elev=30,azim=0,roll=0)
 plt.show()
 
@@ -66,7 +72,6 @@ plt.show()
 # Defining Harris Variables #
 r_c = harris_p3['r_c']
 sig_v = harris_p3['sig_v']
-ID_h = harris_p1['ID']
 
 # Scatter plot of the cluster core radius vs the velocity distribution #
 plt.scatter(r_c, sig_v)

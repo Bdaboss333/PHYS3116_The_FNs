@@ -55,6 +55,7 @@ Z=harris_p1['Z']
 plt.scatter(R_gc, abs(Z))
 for i, txt in enumerate(ID):
     plt.annotate(txt, (R_gc[i], abs(Z[i])), fontsize=8)
-plt.xlabel("Galactocentric Radius ()")
-plt.ylabel("Height from Plane ()")
+plt.xlabel("Galacticentric Radius (kpc)")
+plt.ylabel("Height from Plane (kpc)")
+plt.title("Galacticentric Radius vs Height over Galactic Plane")
 plt.show()
