@@ -11,52 +11,142 @@ Classification of Accreted and In-Situ stars and cluster
 import matplotlib.pyplot as plt
 import pandas as pd
 import numpy as np
-import astropy.io
+import math
 
-# Attempting to merge
-harris_p1 = pd.read_csv('HarrisPartI.csv')
-harris_p3 = pd.read_csv('HarrisPartIII.csv')
+# Merging
 krause = pd.read_csv('Krause21.csv')
 vandenberg = pd.read_csv('vandenBerg_table2.csv')
 
-
+# Rename Krause NGC ID column to 'NGC' in preparation for merging
 krause.rename(columns={'Object': '#NGC'}, inplace=True)
 
+# Append 'NGC' to start of each ID in vanden berg so that it can be merged with krause 
 def renameID(ID):
     return 'NGC' + ID
 
 vandenberg['#NGC'] = vandenberg['#NGC'].apply(renameID)
 
-# Method 1
+# Start by merging krause and vanden berg datasets
 krause_and_vandenberg_merged = pd.merge(krause,vandenberg,on='#NGC')
 
-# Method 2 to include unique GCs
-# krause_and_vandenberg_merged = pd.concat([krause,vandenberg])
-# k_and_v_fixed = krause_and_vandenberg_merged.drop_duplicates(subset=['#NGC'])
+# Include unique GCs which are missed by merge
+krause_and_vandenberg_unique = pd.concat([krause_and_vandenberg_merged,krause,vandenberg])
+k_and_v_complete = krause_and_vandenberg_unique.drop_duplicates(subset=['#NGC'])
+
+# Merge age and feh columns of unique gcs
+pd.to_numeric(k_and_v_complete['FeH_x'],errors='coerce')
+pd.to_numeric(k_and_v_complete['FeH'],errors='coerce')
+pd.to_numeric(k_and_v_complete['Age_x'],errors='coerce')
+pd.to_numeric(k_and_v_complete['Age'],errors='coerce')
+# pd.to_numeric(k_and_v_complete['Age_err'],errors='coerce')
+
+
+# fillna fn replaces NaN in first column with the chosen data, in this case the second 
+# redundant column, 'merging' the two columns
+k_and_v_complete['FeH_x'] = k_and_v_complete['FeH_x'].fillna(k_and_v_complete['FeH'])
+k_and_v_complete['Age_x'] = k_and_v_complete['Age_x'].fillna(k_and_v_complete['Age'])
+
+# Delete redundant columns
+k_and_v_complete.drop(columns = ['FeH','Age'],inplace=True)
 
 # From now on the category I will be looking at is the two branches of the metallicity age relationship
 # One branch goes towards younger end while other one goes straight up
 # Branch to younger end correlates most often to accreted while straight up is in-situ
+# Based on research in 'Accreted versus in situ Milky Way globular clusters' from Duncan A. Forbes, Terry Bridges
 
-# Find an equation that splits two branches
+# Create bounding box that identifies GCs that we are unsure about
+box_xs = np.linspace(12,15,2)
+box_ys = np.linspace(-2.6,-1.6,2)
 
-y_split_xs = np.linspace(12,15,8)
-x_split_ys = np.linspace(-2.6,-1.6,8)
+fixed_ys = [-1.6] * len(box_xs)
+fixed_xs = [12] * len(box_ys)
 
-y_split_ys = [-1.6] * len(y_split_xs)
-x_split_xs = [12] * len(x_split_ys)
+# Define a splitting function which separates two branches based on non-linear line of best fit
+def split_fn(x):
+    y = -0.2 * math.exp(0.3 * x - 1.2) + 1.2
+    return y
 
-print(y_split_ys)
-print(x_split_xs)
+# Create data points
+split_xs = np.linspace(10.4,14.85,50)
+split_ys = [split_fn(x) for x in split_xs]
+
 
 plt.figure(0)
-plt.scatter(krause_and_vandenberg_merged['Age_x'],krause_and_vandenberg_merged['FeH_x'],c='red')
-plt.errorbar(krause_and_vandenberg_merged['Age_x'],krause_and_vandenberg_merged['FeH_x'],yerr=krause_and_vandenberg_merged['Age_err'],capsize=5,ecolor='red',fmt=" ")
-plt.plot(y_split_xs,y_split_ys,linestyle='--',c='black')
-plt.plot(x_split_xs,x_split_ys,linestyle='--',c='black')
-plt.ylim(bottom=-2.6)
+plt.grid()
+plt.scatter(k_and_v_complete['Age_x'],k_and_v_complete['FeH_x'],c='black',s=7)
+plt.errorbar(k_and_v_complete['Age_x'],k_and_v_complete['FeH_x'],xerr=k_and_v_complete['Age_err'],capsize=3,ecolor='black',fmt=" ")
+plt.ylim(top=-0.5,bottom=-2.5)
 plt.xlim(right=15)
 plt.title('Metallicity vs. Age')
 plt.ylabel('[Fe/H]')
 plt.xlabel('Age (Gyr)')
+
+plt.figure(1)
+plt.grid()
+plt.plot(split_xs,split_ys,linestyle='-',c='r')
+plt.scatter(k_and_v_complete['Age_x'],k_and_v_complete['FeH_x'],c='black',s=7)
+plt.errorbar(k_and_v_complete['Age_x'],k_and_v_complete['FeH_x'],xerr=k_and_v_complete['Age_err'],capsize=3,ecolor='black',fmt=" ")
+plt.plot(box_xs,fixed_ys,linestyle='--',c='black')
+plt.plot(fixed_xs,box_ys,linestyle='--',c='black')
+plt.ylim(top=-0.5,bottom=-2.5)
+plt.xlim(right=15)
+plt.title('Metallicity vs. Age')
+plt.ylabel('[Fe/H]')
+plt.xlabel('Age (Gyr)')
+
+# Determine which GCs are above split line and which below, above being in-situ
+# and below being accreted
+
+# Add column to dataset for classification of in-situ or accreted
+k_and_v_complete['Classification'] = 'Placeholder'
+
+# Define functions to determine whether in-situ or accreted
+
+# Categorises whether given GC is accreted, in-situ or unsure
+def classify(feh,age,age_err):
+
+    # If an age error is unavailable, set it to zero for calculations
+    if type(age_err) == None:
+        age_err = 0
+
+    # If GC inside 'unsure box' it is unknown
+    if feh <= -1.6 and (age + age_err) >= 12:
+        return 'Unsure'
+
+    # If GC error range below split curve it is accreted
+    elif feh < -0.2 * math.exp(0.3 * (age + age_err) - 1.2) + 1.2:
+        return 'Accreted'
+    
+    # If GC error range above split curve it is in-situ
+    elif feh > -0.2 * math.exp(0.3 * (age - age_err) - 1.2) + 1.2:
+        return 'In-situ'
+    else:
+        return 'Unsure'
+    
+# Apply function to all GCs in dataset and write output to Classification column
+for i in range(len(k_and_v_complete['#NGC'])):
+    k_and_v_complete['Classification'].iloc[i] = classify(k_and_v_complete['FeH_x'].iloc[i],
+                                                  k_and_v_complete['Age_x'].iloc[i],
+                                                  k_and_v_complete['Age_err'].iloc[i])
+
+# Where .iloc ensures that i is interpreted as a position index and isn't searching for an
+# FeH that == i, which I mistakenly did before
+
+# Make table with just feh, age, age_err and classification
+k_and_v_results = k_and_v_complete.drop(columns = ['Mstar','rh','C5','Name','FeH_y','Age_y','Method','Figs','Range','HBtype','R_G','M_V','v_e0','log_sigma_0'])
+
+
+
+# Plot original graph but without errorbars and colour/shape based on whether accreted, in-situ or unsure
+plt.figure(2)
+plt.grid()
+plt.scatter(k_and_v_results['Age_x'][k_and_v_results['Classification']=='Accreted'],k_and_v_results['FeH_x'][k_and_v_results['Classification']=='Accreted'],c='r',s=15,marker='x')  
+plt.scatter(k_and_v_results['Age_x'][k_and_v_results['Classification']=='In-situ'],k_and_v_results['FeH_x'][k_and_v_results['Classification']=='In-situ'],c='b',s=15,marker='^')
+plt.scatter(k_and_v_results['Age_x'][k_and_v_results['Classification']=='Unsure'],k_and_v_results['FeH_x'][k_and_v_results['Classification']=='Unsure'],c='black',s=7,marker='o')
+plt.ylim(top=-0.5,bottom=-2.5)
+plt.xlim(right=15)
+plt.title('Metallicity vs. Age')
+plt.ylabel('[Fe/H]')
+plt.xlabel('Age (Gyr)')
+
 plt.show()
