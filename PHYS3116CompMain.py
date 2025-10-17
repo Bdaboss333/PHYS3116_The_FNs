@@ -109,3 +109,26 @@ ax.plot3D(x_coord,y_coord,z_coord,'o', c='red')
 ax.plot3D(x_coord2,y_coord2,z_coord2,'o', c='blue')
 ax.view_init(elev=30,azim=0,roll=0)
 plt.show()
+
+# Scatter plot of the age vs metallicity from merged cluster data but adding colour to represent distance from galactic centre#
+r=np.sqrt(totmerge2['X']**2 + totmerge2['Y']**2 + totmerge2['Z']**2)
+cond1=r<20
+cond2=r>=20
+
+FeH = totmerge2['FeH_x'][cond1]
+Age = totmerge2['Age_x'][cond1]
+ID = totmerge2['ID'][cond1]
+FeH2 = totmerge2['FeH_x'][cond2]
+Age2 = totmerge2['Age_x'][cond2]
+ID2 = totmerge2['ID'][cond2]
+
+# Added a colourmap to visualize if the GC's group together depending on r #
+plt.scatter(Age, FeH, c = 'steelblue', label='r < 20kpc')
+plt.scatter(Age2, FeH2, c = 'lightcoral', label='r >= 20kpc')
+
+# plot with titles #
+plt.xlabel("Age of merged Clusters (Gyr)")
+plt.ylabel("Metallicity of merged Clusters (FeH)")
+plt.title("Age vs Metallicity of the merged Globular Clusters w/ colour-coded radial distance")
+plt.legend()
+plt.show()
