@@ -24,13 +24,19 @@ totmerge2 = pd.read_csv('totmerge2.csv')
 harris_x = harris_p1['X']
 harris_y = harris_p1['Y']
 harris_z = harris_p1['Z']
+v_r = harris_p3['v_r']
 ID_h = harris_p1['ID']
+
 
 plt.figure(1)
 ax = plt.axes(projection='3d')
-ax.plot3D(harris_x,harris_y,harris_z,'o')
+# Made data point outlines black to see some of the colourmapped points easier #
+ax.scatter(harris_x,harris_y,harris_z,c=v_r,edgecolors='black',cmap='RdBu')
+# added labels to the plot to make visualisation and determination easier. because there are so many clusters it is important to know which clusters lie where, though for now only the outliers are incredibly important #
 for i in range(len(ID_h)):
     ax.text(harris_x[i], harris_y[i], harris_z[i], ID_h [i], color='black', fontsize=8)
+# Added a colour bar which maps the heliocentric radial velocities, not sure if it will help too much but its worth a try to see if there is a common trend #
+plt.colorbar(ax.collections[0], ax=ax, label='Heliocentric Radial Velocity (km/s)')
 ax.set_xlabel('X (kpc)')
 ax.set_ylabel('Y (kpc)')
 ax.set_zlabel('Z (kpc)')
