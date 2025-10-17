@@ -6,11 +6,16 @@ import pandas as pd
 import numpy as np
 import astropy.io
 
+
 # wanna try find some sort of pattern between the FeH in in-situ vs accreted globular clusters
 
 
 
 totmerge2 = pd.read_csv('totmerge2.csv')
+harris_p1 = pd.read_csv('HarrisPartI.csv')
+harris_p3 = pd.read_csv('HarrisPartIII.csv')
+krause = pd.read_csv('Krause21.csv')
+vandenberg = pd.read_csv('vandenBerg_table2.csv')
 # Gonna try add colour to the 3D plot 
 
 # 3D plot of all GC's with metalicity < -1
@@ -32,3 +37,26 @@ pd.set_option('display.max_rows', None)
 met=totmerge2['FeH_x']
 sorted_met=sorted(met)
 print(sorted_met)
+
+# Scatter plot of the age vs metallicity from merged cluster data but adding colour to represent distance from galactic centre#
+r=np.sqrt(totmerge2['X']**2 + totmerge2['Y']**2 + totmerge2['Z']**2)
+cond1=r<20
+cond2=r>=20
+
+FeH = totmerge2['FeH_x'][cond1]
+Age = totmerge2['Age_x'][cond1]
+ID = totmerge2['ID'][cond1]
+FeH2 = totmerge2['FeH_x'][cond2]
+Age2 = totmerge2['Age_x'][cond2]
+ID2 = totmerge2['ID'][cond2]
+
+# Added a colourmap to visualize if the GC's group together depending on r #
+plt.scatter(Age, FeH, c = 'steelblue', label='r < 20kpc')
+plt.scatter(Age2, FeH2, c = 'lightcoral', label='r >= 20kpc')
+
+# plot with titles #
+plt.xlabel("Age of merged Clusters (Gyr)")
+plt.ylabel("Metallicity of merged Clusters (FeH)")
+plt.title("Age vs Metallicity of the merged Globular Clusters w/ colour-coded radial distance")
+plt.legend()
+plt.show()
