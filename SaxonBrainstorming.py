@@ -30,7 +30,7 @@ print(totmerge2)
 r_c = totmerge2['r_c']
 sig_v = totmerge2['sig_v']
 ID_h = totmerge2['ID']
-Age_v = totmerge2['Age_y']
+Age_v = totmerge2['Age_x']
 
 # Scatter plot of the cluster core radius vs the velocity distribution #
 # Added a colourmap and colour index to the scatterplot #
@@ -53,9 +53,43 @@ ID=harris_p1['ID']
 R_gc=harris_p1['R_gc']
 Z=harris_p1['Z']
 plt.scatter(R_gc, abs(Z))
-for i, txt in enumerate(ID):
-    plt.annotate(txt, (R_gc[i], abs(Z[i])), fontsize=8)
+
 plt.xlabel("Galacticentric Radius (kpc)")
 plt.ylabel("Height from Plane (kpc)")
 plt.title("Galacticentric Radius vs Height over Galactic Plane")
+plt.show()
+
+fig, axes = plt.subplots(2,3)
+
+ID_1 = totmerge['ID']
+x_1 = totmerge['X']
+y_1 = totmerge['Y']
+z_1 = totmerge['Z']
+ID_2 = totmerge2['ID']
+x_2 = totmerge2['X']
+y_2 = totmerge2['Y']
+z_2 = totmerge2['Z']
+
+axes[0,0].scatter(x_1, y_1)
+axes[0,0].set_title('Galactic Distance X vs Y')
+
+axes[0,1].scatter(x_1, z_1)
+axes[0,1].set_title('Galactic Distance X vs Z')
+
+axes[0,2].scatter(y_1, z_1)
+axes[0,2].set_title('Galactic Distance Y vs Z')
+
+pl1 = axes[1,0].scatter(x_2, y_2, c=Age_v, cmap='coolwarm')
+axes[1,0].set_title('Galactic Distance X vs Y')
+plt.colorbar(pl1, ax=axes[1,0], label='Age')
+
+pl2 = axes[1,1].scatter(x_2, z_2, c=Age_v, cmap='coolwarm')
+axes[1,1].set_title('Galactic Distance X vs Z')
+plt.colorbar(pl2, ax=axes[1,1], label='Age')
+
+pl3 = axes[1,2].scatter(y_2, z_2, c=Age_v, cmap='coolwarm')
+axes[1,2].set_title('Galactic Distance Y vs Z')
+plt.colorbar(pl3, ax=axes[1,2], label='Age')
+
+plt.tight_layout()
 plt.show()
