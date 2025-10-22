@@ -151,4 +151,9 @@ plt.ylabel('[Fe/H]')
 plt.xlabel('Age (Gyr)')
 plt.legend()
 
-plt.show()
+# Drop rest of columns so only NGC, Name and classification
+k_and_v_results = k_and_v_results.drop(columns = ['Age_x','FeH_x','Age_err','Class','AltName'])
+
+
+# plt.show()
+print(k_and_v_results)
