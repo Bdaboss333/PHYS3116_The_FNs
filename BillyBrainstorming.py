@@ -72,27 +72,28 @@ split_ys = [split_fn(x) for x in split_xs]
 
 
 plt.figure(0)
-plt.grid()
+# plt.grid()
 plt.scatter(k_and_v_complete['Age_x'],k_and_v_complete['FeH_x'],c='black',s=7)
-plt.errorbar(k_and_v_complete['Age_x'],k_and_v_complete['FeH_x'],xerr=k_and_v_complete['Age_err'],capsize=3,ecolor='black',fmt=" ")
+# plt.errorbar(k_and_v_complete['Age_x'],k_and_v_complete['FeH_x'],xerr=k_and_v_complete['Age_err'],capsize=3,ecolor='black',fmt=" ")
 plt.ylim(top=-0.5,bottom=-2.5)
 plt.xlim(right=15)
-plt.title('Metallicity vs. Age')
+plt.title('Metallicity vs. Age of Krause and vandenBerg GCs')
 plt.ylabel('[Fe/H]')
 plt.xlabel('Age (Gyr)')
 
 plt.figure(1)
-plt.grid()
-plt.plot(split_xs,split_ys,linestyle='-',c='r')
+# plt.grid()
+plt.plot(split_xs,split_ys,linestyle='-',c='r',label='Classification line')
 plt.scatter(k_and_v_complete['Age_x'],k_and_v_complete['FeH_x'],c='black',s=7)
 plt.errorbar(k_and_v_complete['Age_x'],k_and_v_complete['FeH_x'],xerr=k_and_v_complete['Age_err'],capsize=3,ecolor='black',fmt=" ")
-plt.plot(box_xs,fixed_ys,linestyle='--',c='black')
-plt.plot(fixed_xs,box_ys,linestyle='--',c='black')
+plt.plot(box_xs,fixed_ys,linestyle='--',c='r',label='Region of uncertainty')
+plt.plot(fixed_xs,box_ys,linestyle='--',c='r')
 plt.ylim(top=-0.5,bottom=-2.5)
 plt.xlim(right=15)
-plt.title('Metallicity vs. Age')
+plt.title('Metallicity vs. Age with Error and Classification Regions')
 plt.ylabel('[Fe/H]')
 plt.xlabel('Age (Gyr)')
+plt.legend()
 
 # Determine which GCs are above split line and which below, above being in-situ
 # and below being accreted
@@ -106,8 +107,8 @@ k_and_v_complete['Classification'] = 'Placeholder'
 def classify(feh,age,age_err):
 
     # If an age error is unavailable, set it to zero for calculations
-    if type(age_err) == None:
-        age_err = 0
+    if pd.isna(age_err):
+        age_err = np.mean(k_and_v_complete['Age_err'])
 
     # If GC inside 'unsure box' it is unknown
     if feh <= -1.6 and (age + age_err) >= 12:
@@ -139,14 +140,15 @@ k_and_v_results = k_and_v_complete.drop(columns = ['Mstar','rh','C5','Name','FeH
 
 # Plot original graph but without errorbars and colour/shape based on whether accreted, in-situ or unsure
 plt.figure(2)
-plt.grid()
-plt.scatter(k_and_v_results['Age_x'][k_and_v_results['Classification']=='Accreted'],k_and_v_results['FeH_x'][k_and_v_results['Classification']=='Accreted'],c='r',s=15,marker='x')  
-plt.scatter(k_and_v_results['Age_x'][k_and_v_results['Classification']=='In-situ'],k_and_v_results['FeH_x'][k_and_v_results['Classification']=='In-situ'],c='b',s=15,marker='^')
-plt.scatter(k_and_v_results['Age_x'][k_and_v_results['Classification']=='Unsure'],k_and_v_results['FeH_x'][k_and_v_results['Classification']=='Unsure'],c='black',s=7,marker='o')
+# plt.grid()
+plt.scatter(k_and_v_results['Age_x'][k_and_v_results['Classification']=='Accreted'],k_and_v_results['FeH_x'][k_and_v_results['Classification']=='Accreted'],c='r',s=15,marker='x',label='Accreted')  
+plt.scatter(k_and_v_results['Age_x'][k_and_v_results['Classification']=='In-situ'],k_and_v_results['FeH_x'][k_and_v_results['Classification']=='In-situ'],c='b',s=15,marker='^',label='In-situ')
+plt.scatter(k_and_v_results['Age_x'][k_and_v_results['Classification']=='Unsure'],k_and_v_results['FeH_x'][k_and_v_results['Classification']=='Unsure'],c='black',s=7,marker='o',label='Unclassified')
 plt.ylim(top=-0.5,bottom=-2.5)
 plt.xlim(right=15)
 plt.title('Metallicity vs. Age')
 plt.ylabel('[Fe/H]')
 plt.xlabel('Age (Gyr)')
+plt.legend()
 
 plt.show()
