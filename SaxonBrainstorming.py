@@ -1,6 +1,7 @@
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
+import matplotlib.patches as patches
 import csv
 
 harris_p1 = pd.read_csv('HarrisPartI.csv')
@@ -59,6 +60,10 @@ for i, txt in enumerate(ID):
 plt.xlabel("Galacticentric Radius (kpc)")
 plt.ylabel("Height from Plane (kpc)")
 plt.title("Galacticentric Radius vs Height over Galactic Plane")
+plt.plot([0, 10], [10, 10], linestyle='--', color='r') 
+plt.plot([10, 10], [0, 10], linestyle='--', color='r')
+plt.ylim(top=110, bottom=0)
+plt.xlim(left=0,right=130)
 plt.show()
 
 fig, axes = plt.subplots(2,3)
