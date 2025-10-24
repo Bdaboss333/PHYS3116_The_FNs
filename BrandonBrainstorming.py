@@ -60,3 +60,20 @@ plt.ylabel("Metallicity of merged Clusters (FeH)")
 plt.title("Age vs Metallicity of the merged Globular Clusters w/ colour-coded radial distance")
 plt.legend()
 plt.show()
+
+
+# last test
+x_coord = harris_p1['X'][harris_p3['rho_0']<1.5]
+y_coord = harris_p1['Y'][harris_p3['rho_0']<1.5]
+z_coord= harris_p1['Z'][harris_p3['rho_0']<1.5]
+x_coord2 = harris_p1['X'][harris_p3['rho_0']>1.5]
+y_coord2 = harris_p1['Y'][harris_p3['rho_0']>1.5]
+z_coord2= harris_p1['Z'][harris_p3['rho_0']>1.5]
+
+plt.figure(1)
+ax = plt.axes(projection='3d')
+ax.plot3D(x_coord,y_coord,z_coord,'o', c='steelblue')
+ax.plot3D(x_coord2,y_coord2,z_coord2,'o', c='lightcoral')
+ax.view_init(elev=30,azim=0,roll=0)
+plt.show()
+
