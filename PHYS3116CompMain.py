@@ -119,8 +119,8 @@ plt.show()
 
 # Scatter plot of the age vs metallicity from merged cluster data but adding colour to represent distance from galactic centre#
 r=np.sqrt(totmerge2['X']**2 + totmerge2['Y']**2 + totmerge2['Z']**2)
-cond1=r<20
-cond2=r>=20
+cond1=r<10
+cond2=r>=10
 
 FeH = totmerge2['FeH_x'][cond1]
 Age = totmerge2['Age_x'][cond1]
@@ -130,8 +130,8 @@ Age2 = totmerge2['Age_x'][cond2]
 ID2 = totmerge2['ID'][cond2]
 
 # Added a colourmap to visualize if the GC's group together depending on r #
-plt.scatter(Age, FeH, c = 'steelblue', label='r < 20kpc')
-plt.scatter(Age2, FeH2, c = 'lightcoral', label='r >= 20kpc')
+plt.scatter(Age, FeH, c = 'steelblue', label='r < 10kpc')
+plt.scatter(Age2, FeH2, c = 'lightcoral', label='r >= 10kpc')
 
 # plot with titles #
 plt.xlabel("Age of merged Clusters (Gyr)")
