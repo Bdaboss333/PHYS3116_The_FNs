@@ -50,6 +50,12 @@ Y=harris_p1['Y']
 r_c_h=harris_p3['r_c']
 v_r=harris_p3['v_r']
 
+FeH_x = totmerge2['FeH_x']
+Age_x = totmerge2['Age_x']
+FeH_y = totmerge2['FeH_y']
+Age_y = totmerge2['Age_y']
+
+
 # Scatter plot of the cluster core radius vs the velocity distribution #
 # Added a colourmap and colour index to the scatterplot #
 scatter= plt.scatter(r_c, sig_v, c=Age_v, cmap='coolwarm')
@@ -81,9 +87,11 @@ plt.xlabel("Galactocentric Radius ($R = \sqrt{X^{2}+Y^{2}}$) (kpc)")
 plt.ylabel("Height from Plane (kpc)")
 plt.title("Galactocentric Radius vs Height over Galactic Plane")
 plt.plot([10, 10], [0, 110], linestyle='--', color='r', label="10kpc Certainty Range")
-plt.ylim(top=110, bottom=0)
-plt.xlim(left=0,right=100)
+plt.ylim(top=110, bottom=0.1)
+plt.xlim(left=0.1,right=100)
 plt.text(25,70,'# of Possibly Accreted Clusters = 61')
+plt.xscale('log')
+plt.yscale('log')
 plt.legend()
 plt.grid(True)
 plt.show()
@@ -105,6 +113,38 @@ plt.xlabel('Galactic Coordinate X (kpc)')
 plt.ylabel('Galactic Coordinate Y (kpc)')
 plt.title('Galactic Coordinates X vs Y')
 plt.text(-95,22,'# of Possibly Accreted Clusters = 61')
+plt.legend()
+plt.grid(True, alpha=0.6)
+plt.show()
+
+
+conditions3 = [(x_2**2 + y_2**2)**0.5 > 9.8, (x_2**2 + y_2**2)**0.5 <= 9.8]
+
+cond_colours3 = ['blue', 'green']
+
+point_colours3 = np.select(conditions3, cond_colours3, default = 'gray')
+
+plt.scatter(FeH_x,Age_x,c=point_colours3,alpha=0.3)
+for i, txt in enumerate(ID_h):
+    if (x_2[i]**2 + y_2[i]**2)**0.5 > 9.8: 
+        plt.annotate(txt, (FeH_x[i], Age_x[i]), fontsize=8)
+plt.xlabel('[Fe/H]')
+plt.ylabel('Age (Gyr)')
+plt.title('Age vs Metallicity Plot of Krause21 Clusters')
+plt.text(-2.35,8.5,'# of Possibly Accreted Clusters = 19')
+plt.legend()
+plt.grid(True, alpha=0.6)
+plt.show()
+
+
+plt.scatter(FeH_y,Age_y,c=point_colours3,alpha=0.3)
+for i, txt in enumerate(ID_h):
+    if (x_2[i]**2 + y_2[i]**2)**0.5 > 9.8: 
+        plt.annotate(txt, (FeH_y[i], Age_y[i]), fontsize=8)
+plt.xlabel('[Fe/H]')
+plt.ylabel('Age (Gyr)')
+plt.title('Age vs Metallicity Plot of vandenBerg Clusters')
+plt.text(-2.35,9.5,'# of Possibly Accreted Clusters = 12')
 plt.legend()
 plt.grid(True, alpha=0.6)
 plt.show()

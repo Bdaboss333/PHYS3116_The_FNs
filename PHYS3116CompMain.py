@@ -157,5 +157,5 @@ plt.show()
 
 pd.set_option('display.max_rows', None)
 met=harris_p3['rho_0']
-sorted_met=sorted(met)
+sorted_met=sorted(10**met)
 print(sorted_met)
