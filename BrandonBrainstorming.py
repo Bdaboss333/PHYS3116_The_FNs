@@ -34,7 +34,7 @@ ax.view_init(elev=30,azim=0,roll=0)
 plt.show()
 
 pd.set_option('display.max_rows', None)
-met=totmerge2['FeH_x']
+met=harris_p3['rho_0']
 sorted_met=sorted(met)
 print(sorted_met)
 

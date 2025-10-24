@@ -154,3 +154,8 @@ ax.plot3D(x_coord,y_coord,z_coord,'o', c='steelblue')
 ax.plot3D(x_coord2,y_coord2,z_coord2,'o', c='lightcoral')
 ax.view_init(elev=30,azim=0,roll=0)
 plt.show()
+
+pd.set_option('display.max_rows', None)
+met=harris_p3['rho_0']
+sorted_met=sorted(met)
+print(sorted_met)
