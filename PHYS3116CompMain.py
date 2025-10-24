@@ -14,6 +14,7 @@ harris_p3 = pd.read_csv('HarrisPartIII.csv')
 krause = pd.read_csv('Krause21.csv')
 vandenberg = pd.read_csv('vandenBerg_table2.csv')
 totmerge2 = pd.read_csv('totmerge2.csv')
+vandenberg_f = pd.read_csv('vandenBerg_table2_fixed.csv')
 
 # Krause21 and vandenBerg_table2 will be primarily used for their age and metallicity
 # HarrisPartI and PartIII will be used for their dynamics data
@@ -60,9 +61,9 @@ plt.title("Age vs Metallicity of the Krause Globular Clusters")
 plt.show()
 
 # Scatter plot of the age vs metallicity from VanderBerg data #
-FeH_v = vandenberg['FeH']
-Age_v = vandenberg['Age']
-ID_v = vandenberg['Name']
+FeH_v = vandenberg_f['FeH']
+Age_v = vandenberg_f['Age']
+ID_v = vandenberg_f['ID']
 
 # Added a colourmap to visualize how the GC colours would change with age #
 plt.scatter(Age_v, FeH_v, c = Age_v, cmap = 'coolwarm')

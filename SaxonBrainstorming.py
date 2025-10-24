@@ -9,7 +9,6 @@ harris_p3 = pd.read_csv('HarrisPartIII.csv')
 krause = pd.read_csv('Krause21_fixed.csv')
 vandenberg = pd.read_csv('vandenBerg_table2_fixed.csv')
 
-
 # Attempting to merge the Krause21 and Vandenberg data to make plotting easier (there are a few issues with how the tables merge as it removes all unique GC's that are present in Vandenberg but not Krause21) # 
 merged = pd.merge(krause, vandenberg, on='ID', how='outer')
 print(merged)
@@ -28,10 +27,28 @@ print(totmerge2)
 
 # Defining Merged Variables #
 # Also defined the age_x colomn for the colourbar, need to find out how to merge this with age_y to get a better representation #
+
+ID_1 = totmerge['ID']
+x_1 = totmerge['X']
+y_1 = totmerge['Y']
+z_1 = totmerge['Z']
+ID_2 = totmerge2['ID']
+x_2 = totmerge2['X']
+y_2 = totmerge2['Y']
+z_2 = totmerge2['Z']
+
 r_c = totmerge2['r_c']
 sig_v = totmerge2['sig_v']
 ID_h = totmerge2['ID']
 Age_v = totmerge2['Age_x']
+
+ID=harris_p1['ID']
+R_gc=harris_p1['R_gc']
+Z=harris_p1['Z']
+X=harris_p1['X']
+Y=harris_p1['Y']
+r_c_h=harris_p3['r_c']
+v_r=harris_p3['v_r']
 
 # Scatter plot of the cluster core radius vs the velocity distribution #
 # Added a colourmap and colour index to the scatterplot #
@@ -49,33 +66,24 @@ plt.show()
 # Even though NGC5139 does not have chemical/age data, the fact that it is such a major outlier in the dynamical data gives me strong belief that its accreted #
 # Added colourbars and stuff to experiment with how to better condense our data
 
-# Made a plot of Galacticentric radius vs absolute height above the plane of the galaxy, as most of the in situ globular clusters are of decently similar distance, the accreted clusters should be pretty apparent #
-ID=harris_p1['ID']
-R_gc=harris_p1['R_gc']
-Z=harris_p1['Z']
-plt.scatter(R_gc, abs(Z))
+# Made a plot of Galactocentric radius vs absolute height above the plane of the galaxy, as most of the in situ globular clusters are of decently similar distance, the accreted clusters should be pretty apparent #
+R = np.sqrt(X**2+Y**2)
+scatter2 = plt.scatter(R, abs(Z))
 for i, txt in enumerate(ID):
-    if R_gc[i] > 10: 
-        plt.annotate(txt, (R_gc[i], abs(Z[i])), fontsize=8)
-plt.xlabel("Galacticentric Radius (kpc)")
+    if R[i] > 10:
+        plt.annotate(txt, (R[i], abs(Z[i])), fontsize=8)
+plt.xlabel("Galactocentric Radius ($R = \sqrt{X^{2}+Y^{2}}$) (kpc)")
 plt.ylabel("Height from Plane (kpc)")
-plt.title("Galacticentric Radius vs Height over Galactic Plane")
-plt.plot([0, 10], [10, 10], linestyle='--', color='r') 
-plt.plot([10, 10], [0, 10], linestyle='--', color='r')
+plt.title("Galactocentric Radius vs Height over Galactic Plane")
+plt.plot([10, 10], [0, 110], linestyle='--', color='r', label="10kpc Certainty Range")
 plt.ylim(top=110, bottom=0)
-plt.xlim(left=0,right=130)
+plt.xlim(left=0,right=100)
+plt.legend()
 plt.show()
 
-fig, axes = plt.subplots(2,3)
 
-ID_1 = totmerge['ID']
-x_1 = totmerge['X']
-y_1 = totmerge['Y']
-z_1 = totmerge['Z']
-ID_2 = totmerge2['ID']
-x_2 = totmerge2['X']
-y_2 = totmerge2['Y']
-z_2 = totmerge2['Z']
+
+fig, axes = plt.subplots(2,3)
 
 axes[0,0].scatter(x_1, y_1)
 axes[0,0].set_title('Galactic Distance X vs Y')
@@ -99,4 +107,16 @@ axes[1,2].set_title('Galactic Distance Y vs Z')
 plt.colorbar(pl3, ax=axes[1,2], label='Age')
 
 plt.tight_layout()
+plt.show()
+
+plt.scatter(X,Y)
+theta = np.linspace(0, 2*np.pi, 500)
+r = 10
+x = r * np.cos(theta)
+y = r * np.sin(theta)
+for i, txt in enumerate(ID):
+    if (X[i]**2 + Y[i]**2)**0.5 > 10: 
+        plt.annotate(txt, (X[i], Y[i]), fontsize=8)
+plt.plot(x, y, 'r--', lw=2)
+plt.axis('equal')
 plt.show()
