@@ -1,7 +1,7 @@
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
-import matplotlib.patches as patches
+import matplotlib.patches as Patch
 import csv
 
 harris_p1 = pd.read_csv('HarrisPartI.csv')
@@ -68,55 +68,43 @@ plt.show()
 
 # Made a plot of Galactocentric radius vs absolute height above the plane of the galaxy, as most of the in situ globular clusters are of decently similar distance, the accreted clusters should be pretty apparent #
 R = np.sqrt(X**2+Y**2)
-scatter2 = plt.scatter(R, abs(Z))
-for i, txt in enumerate(ID):
-    if R[i] > 10:
-        plt.annotate(txt, (R[i], abs(Z[i])), fontsize=8)
+
+conditions = [v_r<100, (v_r>=100) & (v_r<=300), v_r>300]
+
+cond_colours = ['purple', 'red', 'green']
+
+point_colours = np.select(conditions, cond_colours, default = 'gray')
+
+
+plt.scatter(R, abs(Z), c=point_colours, alpha=0.3)
 plt.xlabel("Galactocentric Radius ($R = \sqrt{X^{2}+Y^{2}}$) (kpc)")
 plt.ylabel("Height from Plane (kpc)")
 plt.title("Galactocentric Radius vs Height over Galactic Plane")
 plt.plot([10, 10], [0, 110], linestyle='--', color='r', label="10kpc Certainty Range")
 plt.ylim(top=110, bottom=0)
 plt.xlim(left=0,right=100)
+plt.text(25,70,'# of Possibly Accreted Clusters = 61')
 plt.legend()
+plt.grid(True)
 plt.show()
 
+conditions2 = [(X**2 + Y**2)**0.5 > 10, (X**2 + Y**2)**0.5 <= 10]
 
+cond_colours2 = ['blue', 'green']
 
-fig, axes = plt.subplots(2,3)
+point_colours2 = np.select(conditions2, cond_colours2, default = 'gray')
 
-axes[0,0].scatter(x_1, y_1)
-axes[0,0].set_title('Galactic Distance X vs Y')
-
-axes[0,1].scatter(x_1, z_1)
-axes[0,1].set_title('Galactic Distance X vs Z')
-
-axes[0,2].scatter(y_1, z_1)
-axes[0,2].set_title('Galactic Distance Y vs Z')
-
-pl1 = axes[1,0].scatter(x_2, y_2, c=Age_v, cmap='coolwarm')
-axes[1,0].set_title('Galactic Distance X vs Y')
-plt.colorbar(pl1, ax=axes[1,0], label='Age')
-
-pl2 = axes[1,1].scatter(x_2, z_2, c=Age_v, cmap='coolwarm')
-axes[1,1].set_title('Galactic Distance X vs Z')
-plt.colorbar(pl2, ax=axes[1,1], label='Age')
-
-pl3 = axes[1,2].scatter(y_2, z_2, c=Age_v, cmap='coolwarm')
-axes[1,2].set_title('Galactic Distance Y vs Z')
-plt.colorbar(pl3, ax=axes[1,2], label='Age')
-
-plt.tight_layout()
-plt.show()
-
-plt.scatter(X,Y)
+plt.scatter(X,Y,c=point_colours2, alpha=0.3)
 theta = np.linspace(0, 2*np.pi, 500)
 r = 10
 x = r * np.cos(theta)
 y = r * np.sin(theta)
-for i, txt in enumerate(ID):
-    if (X[i]**2 + Y[i]**2)**0.5 > 10: 
-        plt.annotate(txt, (X[i], Y[i]), fontsize=8)
-plt.plot(x, y, 'r--', lw=2)
+plt.plot(x, y, '--', c='red', lw=1.5, label='10kpc Certainty Range')
 plt.axis('equal')
+plt.xlabel('Galactic Coordinate X (kpc)')
+plt.ylabel('Galactic Coordinate Y (kpc)')
+plt.title('Galactic Coordinates X vs Y')
+plt.text(-95,22,'# of Possibly Accreted Clusters = 61')
+plt.legend()
+plt.grid(True, alpha=0.6)
 plt.show()
