@@ -11,6 +11,12 @@ import math
 
 # %% Classification method 1 (Billy)
 
+# Import libraries
+import matplotlib.pyplot as plt
+import pandas as pd
+import numpy as np
+import math
+
 # Read Krause and vandenBerg csv files
 krause = pd.read_csv('Krause21.csv')
 vandenberg = pd.read_csv('vandenBerg_table2.csv')
@@ -193,11 +199,13 @@ Age_y = totmerge2['Age_y']
 # Made a plot of Galactocentric radius vs absolute height above the plane of the galaxy, as most of the in situ globular clusters are of decently similar distance, the accreted clusters should be pretty apparent #
 R = np.sqrt(X**2+Y**2)
 
-conditions = [v_r<100, (v_r>=100) & (v_r<=300), v_r>300]
+R_std = np.std(R)
+
+conditions = [R>3*R_std, (R>R_std) & (v_r<3*R_std), R<R_std]
 
 cond_colours = ['purple', 'red', 'green']
 
-point_colours = np.select(conditions, cond_colours, default = 'gray')
+point_colours = np.select(conditions, cond_colours, default = 'red')
 
 
 plt.scatter(R, abs(Z), c=point_colours, alpha=0.3)
@@ -241,8 +249,12 @@ point_colours3 = np.select(conditions3, cond_colours3, default = 'gray')
 
 plt.scatter(FeH_x,Age_x,c=point_colours3,alpha=0.3)
 for i, txt in enumerate(ID_h):
-    if (x_2[i]**2 + y_2[i]**2)**0.5 > 9.8: 
+    if ((x_2[i]**2 + y_2[i]**2)**0.5 > 9.8) & (FeH_x[i] > -1.75): 
         plt.annotate(txt, (FeH_x[i], Age_x[i]), fontsize=8)
+plt.plot([-1.75, -1.75], [12, 14.5], linestyle='--', color='r', label="Uncertainty Range")
+plt.plot([-2.5, -1.75], [12, 12], linestyle='--', color='r')
+plt.ylim(top=14.5, bottom = 7)
+plt.xlim(left=-2.5, right=0)
 plt.xlabel('[Fe/H]')
 plt.ylabel('Age (Gyr)')
 plt.title('Age vs Metallicity Plot of Krause21 Clusters')
@@ -259,11 +271,59 @@ for i, txt in enumerate(ID_h):
 plt.xlabel('[Fe/H]')
 plt.ylabel('Age (Gyr)')
 plt.title('Age vs Metallicity Plot of vandenBerg Clusters')
-plt.text(-2.35,9.5,'# of Possibly Accreted Clusters = 12')
+plt.text(-2.35,9.5,'# of Possibly Accreted Clusters = 13')
 plt.legend()
 plt.grid(True, alpha=0.6)
 plt.show()
 
+R_2 = np.sqrt(x_1**2 + y_1**2)
+
+R_2_std = np.std(R_2)
+
+conditions4 = [(R_2 > 10) & (FeH_x >= -1.75) | (R_2 > 10) & (FeH_y >= -1.75) | (R_2>3*R_2_std), R_2 > 10, R_2 <= 10]
+
+cond_colours4 = ['purple', 'blue', 'green']
+
+point_colours4 = np.select(conditions4, cond_colours4, default = 'gray')
+
+plt.scatter(x_1,y_1,c=point_colours4, alpha=0.3)
+theta = np.linspace(0, 2*np.pi, 500)
+r = 10
+x = r * np.cos(theta)
+y = r * np.sin(theta)
+plt.plot(x, y, '--', c='red', lw=1.5, label='10kpc Certainty Range')
+plt.axis('equal')
+plt.xlabel('Galactic Coordinate X (kpc)')
+plt.ylabel('Galactic Coordinate Y (kpc)')
+plt.title('Galactic Coordinates X vs Y')
+plt.text(-95,22,'# of Possibly Accreted Clusters = 61')
+plt.grid(True, alpha=0.6)
+plt.show()
+
+# Add column to dataset for classification of in-situ or accreted
+totmerge['Classification2'] = 'Placeholder'
+
+# Define functions to determine whether in-situ or accreted
+
+# Categorises whether given GC is accreted, in-situ or unsure
+def classify(FeH_x,Age_x,FeH_y,R_2):
+    if (R_2 > 9.8) & (FeH_x >= -1.75) | (R_2 > 9.8) & (FeH_y >= -1.75) | (R_2>3*R_2_std):
+        return 'Accreted'
+    elif (R_2 > 9.8) | (FeH_x>=-1.75) & (Age_x<12.5) | (FeH_x<=-1.75) & (Age_x>=12.5):
+        return 'Unsure'
+    elif (R_2 <= 9.8):
+        return 'In-Situ'
+
+for i in range(len(totmerge['ID'])):
+    totmerge['Classification'].iloc[i] = classify(totmerge['FeH_x'].iloc[i],
+                                                  totmerge['Age_x'].iloc[i],
+                                                  totmerge['FeH_y'].iloc[i],
+                                                  R_2.iloc[i])
+
+classification2 = totmerge.drop(columns = ['Mstar','rh','C5','Name_x','Name_y','FeH_y','Age_y','Method','Figs','Range','HBtype','R_G','M_V','v_e0','log_sigma_0','Age_x','FeH_x','Age_err','AltName','X','Y','Z','RA','DEC','L','B','R_Sun','R_gc','v_r','v_r_e','v_LSR','sig_v','sig_v_e','c','r_c','r_h','mu_V','rho_0','lg_tc','lg_th'])
+pd.set_option('display.max_rows', None)
+pd.set_option('display.max_columns', None)
+print(classification2)
 # %% Classification Method 3
 
 

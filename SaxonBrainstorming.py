@@ -94,8 +94,6 @@ plt.plot([10, 10], [0, 110], linestyle='--', color='r', label="10kpc Certainty R
 plt.ylim(top=110, bottom=0.1)
 plt.xlim(left=0.1,right=100)
 plt.text(25,70,'# of Possibly Accreted Clusters = 61')
-plt.xscale('log')
-plt.yscale('log')
 plt.legend()
 plt.grid(True)
 plt.show()
@@ -132,6 +130,10 @@ plt.scatter(FeH_x,Age_x,c=point_colours3,alpha=0.3)
 for i, txt in enumerate(ID_h):
     if (x_2[i]**2 + y_2[i]**2)**0.5 > 9.8: 
         plt.annotate(txt, (FeH_x[i], Age_x[i]), fontsize=8)
+plt.plot([-1.75, -1.75], [12, 14.5], linestyle='--', color='r', label="Uncertainty Range")
+plt.plot([-2.5, -1.75], [12, 12], linestyle='--', color='r', label="Uncertainty Range")
+plt.ylim(top=14.5, bottom = 7)
+plt.xlim(left=-2.5, right=0)
 plt.xlabel('[Fe/H]')
 plt.ylabel('Age (Gyr)')
 plt.title('Age vs Metallicity Plot of Krause21 Clusters')
@@ -155,7 +157,9 @@ plt.show()
 
 R_2 = np.sqrt(x_1**2 + y_1**2)
 
-conditions4 = [(R_2 > 10) & (FeH_x >= -1.75) | (R_2 > 10) & (FeH_y >= -1.75), R_2 > 10, R_2 <= 10]
+R_2_std = np.std(R_2)
+
+conditions4 = [(R_2 > 10) & (FeH_x >= -1.75) | (R_2 > 10) & (FeH_y >= -1.75) | (R_2>3*R_2_std), R_2 > 10, R_2 <= 10]
 
 cond_colours4 = ['purple', 'blue', 'green']
 
@@ -174,3 +178,6 @@ plt.title('Galactic Coordinates X vs Y')
 plt.text(-95,22,'# of Possibly Accreted Clusters = 61')
 plt.grid(True, alpha=0.6)
 plt.show()
+
+R_2_std = np.std(R_2)
+print(R_2_std)
