@@ -55,6 +55,10 @@ Age_x = totmerge2['Age_x']
 FeH_y = totmerge2['FeH_y']
 Age_y = totmerge2['Age_y']
 
+rho = harris_p3['rho_0']
+sig_h = harris_p3['sig_v']
+c = harris_p3['c']
+r_t = harris_p3['lg_tc']
 
 # Scatter plot of the cluster core radius vs the velocity distribution #
 # Added a colourmap and colour index to the scatterplot #
@@ -84,7 +88,7 @@ point_colours = np.select(conditions, cond_colours, default = 'gray')
 
 plt.scatter(R, abs(Z), c=point_colours, alpha=0.3)
 plt.xlabel("Galactocentric Radius ($R = \sqrt{X^{2}+Y^{2}}$) (kpc)")
-plt.ylabel("Height from Plane (kpc)")
+plt.ylabel("Height from Plane |Z| (kpc)")
 plt.title("Galactocentric Radius vs Height over Galactic Plane")
 plt.plot([10, 10], [0, 110], linestyle='--', color='r', label="10kpc Certainty Range")
 plt.ylim(top=110, bottom=0.1)
@@ -146,5 +150,27 @@ plt.ylabel('Age (Gyr)')
 plt.title('Age vs Metallicity Plot of vandenBerg Clusters')
 plt.text(-2.35,9.5,'# of Possibly Accreted Clusters = 12')
 plt.legend()
+plt.grid(True, alpha=0.6)
+plt.show()
+
+R_2 = np.sqrt(x_1**2 + y_1**2)
+
+conditions4 = [R_2 > 10, R_2 <= 10, (R_2 > 10) & (FeH_x >= -1.75)]
+
+cond_colours4 = ['blue', 'green', 'orange']
+
+point_colours4 = np.select(conditions4, cond_colours4, default = 'gray')
+
+plt.scatter(x_1,y_1,c=point_colours4, alpha=0.3)
+theta = np.linspace(0, 2*np.pi, 500)
+r = 10
+x = r * np.cos(theta)
+y = r * np.sin(theta)
+plt.plot(x, y, '--', c='red', lw=1.5, label='10kpc Certainty Range')
+plt.axis('equal')
+plt.xlabel('Galactic Coordinate X (kpc)')
+plt.ylabel('Galactic Coordinate Y (kpc)')
+plt.title('Galactic Coordinates X vs Y')
+plt.text(-95,22,'# of Possibly Accreted Clusters = 61')
 plt.grid(True, alpha=0.6)
 plt.show()
