@@ -155,9 +155,9 @@ plt.show()
 
 R_2 = np.sqrt(x_1**2 + y_1**2)
 
-conditions4 = [R_2 > 10, R_2 <= 10, (R_2 > 10) & (FeH_x >= -1.75)]
+conditions4 = [(R_2 > 10) & (FeH_x >= -1.75) | (R_2 > 10) & (FeH_y >= -1.75), R_2 > 10, R_2 <= 10]
 
-cond_colours4 = ['blue', 'green', 'orange']
+cond_colours4 = ['purple', 'blue', 'green']
 
 point_colours4 = np.select(conditions4, cond_colours4, default = 'gray')
 
