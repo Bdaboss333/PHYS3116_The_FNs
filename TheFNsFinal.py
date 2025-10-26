@@ -407,5 +407,16 @@ def assign_value(classification):
 # we are 33% confident that the gc is accreted, and -0.33 means we are 33% sure that the gc is in-situ
 # because we assigned in-situ as negative and accreted as positive
 
+# nvm im a bot no it's not here's new function to convert the number into percentage chance
+
+def convert(value):
+
+    if value >= 0:
+        chance = (1 + abs(value)) / 2 * 100
+    else:
+        chance = -((1 + abs(value)) / 2 * 100)
+
+    return f'{chance}%'
+
 # Now present this data however you like, whether it's just the table or if it's in a plot up to you
 # %%
