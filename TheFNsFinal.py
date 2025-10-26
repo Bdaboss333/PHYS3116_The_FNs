@@ -97,7 +97,7 @@ k_and_v_complete['Classification'] = 'Placeholder'
 # Define functions to determine whether in-situ or accreted
 
 # Categorises whether given GC is accreted, in-situ or unsure
-def classify(feh,age,age_err):
+def classify1(feh,age,age_err):
 
     # If an age error is unavailable, set it to zero for calculations
     if pd.isna(age_err):
@@ -119,7 +119,7 @@ def classify(feh,age,age_err):
     
 # Apply function to all GCs in dataset and write output to Classification column
 for i in range(len(k_and_v_complete['#NGC'])):
-    k_and_v_complete['Classification'].iloc[i] = classify(k_and_v_complete['FeH_x'].iloc[i],
+    k_and_v_complete['Classification'].iloc[i] = classify1(k_and_v_complete['FeH_x'].iloc[i],
                                                   k_and_v_complete['Age_x'].iloc[i],
                                                   k_and_v_complete['Age_err'].iloc[i])
 
@@ -146,8 +146,6 @@ classification1 = k_and_v_results.drop(columns = ['Age_x','FeH_x','Age_err','Cla
 
 # Show results
 plt.show()
-pd.set_option('display.max_rows', None,'display.max_columns',None)
-
 
 # %% Classification Method 2 (Saxon)
 
@@ -303,17 +301,17 @@ totmerge['Classification'] = 'Placeholder'
 # Define functions to determine whether in-situ or accreted #
 
 # Categorises whether given GC is accreted, in-situ or unsure #
-def classify(FeH_x,Age_x,FeH_y,R_2):
+def classify2(FeH_x,Age_x,FeH_y,R_2):
     if (R_2 > 9.8) & (FeH_x >= -1.75) | (R_2 > 9.8) & (FeH_y >= -1.75) | (R_2>3*R_2_std):
         return 'Accreted'
     elif (R_2 > 9.8) | (FeH_x>=-1.75) & (Age_x<12.5) | (FeH_x<=-1.75) & (Age_x>=12.5):
         return 'Unsure'
     elif (R_2 <= 9.8):
-        return 'In-Situ'
+        return 'In-situ'
 
 # Using an .iloc command to determine classifications using the conditions set above by looking at each indexed row #
 for i in range(len(totmerge['ID'])):
-    totmerge['Classification'].iloc[i] = classify(totmerge['FeH_x'].iloc[i],
+    totmerge['Classification'].iloc[i] = classify2(totmerge['FeH_x'].iloc[i],
                                                   totmerge['Age_x'].iloc[i],
                                                   totmerge['FeH_y'].iloc[i],
                                                   R_2.iloc[i])
@@ -336,12 +334,6 @@ print(classification2)
 # For my analysis, I want to observe the distribution of the glocbular clusters, classfying them against their metallicites, luminosity, and HB type
 # The following will predominately analyse the Vandenberg data set
 
-# ----- Importing packages and defining variables ----- #
-import matplotlib.pyplot as plt
-import pandas as pd
-import numpy as np
-import astropy.io
-
 totmerge2 = pd.read_csv('totmerge2.csv')
 harris_p1 = pd.read_csv('HarrisPartI.csv')
 harris_p3 = pd.read_csv('HarrisPartIII.csv')
@@ -360,7 +352,7 @@ ID=vandenberg['#NGC']
 # Under this assumption, we can define the following function to classify the Vandenberg clusters into "In-situ", "Accreted", or "unsure"
 
 
-def classify(FeH, lum, HB):
+def classify3(FeH, lum, HB):
     condFeH_poor  = FeH < -1
     condFeH_rich  = FeH >= -1
     condLum_high  = lum < -9
@@ -380,7 +372,7 @@ def classify(FeH, lum, HB):
 vandenberg['Classification'] = 'Placeholder'
 
 for i in range(len(ID)):
-    vandenberg['Classification'].iloc[i] = classify(FeH.iloc[i],
+    vandenberg['Classification'].iloc[i] = classify3(FeH.iloc[i],
                                                   lum.iloc[i],
                                                   HB.iloc[i],
                                                   )
@@ -392,35 +384,19 @@ classification3 = vandenberg.drop(columns = ['Name','FeH','Age','Age_err','Metho
 # Removes the truncation of the data in terminal so I can read it #
 pd.set_option('display.max_rows', None)
 pd.set_option('display.max_columns', None)
-print(classification3)
-print(classification1)
+
+
 # %% Classification Method 3
 
 
 
 # %% Merging conditions to determine confidence in classifications
 
-# ===== Import packages ==== #
-
-import pandas as pd
-import numpy as np
-import matplotlib.pyplot as plt
-
-# To merge, make sure all our tables have same column name for ngc/id and
-# that all gcs have same naming convention, then do following
-
 # Start by merging our 3 classification results tables
-
-# 2_classifications_merged = pd.merge(classification1,classification2,on='#NGC')
 classifications_merged2 = pd.merge(classification2,classification1,on='#NGC', how='left')
-print(classifications_merged2)
 
 # Then merge this with last classification
-
-# all_classifications_merged = pd.merge(2_classifications_merged,classification3,on='#NGC)
-# this almost work but I had to include a left merge to kee
 all_classifications_merged = pd.merge(classifications_merged2,classification3,on='#NGC', how='left')
-print(all_classifications_merged)
 
 # Now we have finalised table, which should have a column with ngcs/id, then three columns named
 # like Classification 1, Classification 2, etc. for classifactions 1 2 and 3, which are either 'Unsure', 
@@ -438,46 +414,24 @@ def assign_value(classification):
         return 0
     
 # Then do the following to make copy of above table with classifications replaced with value from function
-
-# classification_values = all_classifications_merged[['Classification 1':'Classification 3']].applymap(assign_value)
 classification_values = all_classifications_merged[['Classification_x', 'Classification_y', 'Classification']].applymap(assign_value)
 classification_values.insert(0, '#NGC', all_classifications_merged['#NGC'])
-print(classification_values)
 
-# If this doesn't work try this
-
-# classification_values = classifications_complete['Classification 1','Classificatoin 2','Classification 3'].applymap(assign_value)
-
-# Now we should have table with ngc column and three columns with either 1, -1 or 0
-# Now take the mean across these columns to find the average value which we can use to determine our confidence in
-# our classification, as follows
-
-# classification_values['Classification 1':'Classification 3'] = np.mean(classification_values['Classification 1':'Classification 3'],axis=1)
-# That didn't work so I had to try something else seen below
 classification_cols = ['Classification_x', 'Classification_y', 'Classification']
 classification_values['Classification_mean'] = classification_values[classification_cols].mean(axis=1)
-print(classification_values)
-
-# Again this might not work, if so let me know and I'm happy to debug
-
-# Now we should have table with only 2 columns, one for ngc and one with a float between -1 and 1 i.e. 0.33
-# This number represents our percentage confidence that the gc is a certain classification, i.e. 0.33 means
-# we are 33% confident that the gc is accreted, and -0.33 means we are 33% sure that the gc is in-situ
-# because we assigned in-situ as negative and accreted as positive
-
-# nvm im a bot no it's not here's new function to convert the number into percentage chance
 
 def convert(value):
 
-    if value >= 0:
-        chance = (1 + abs(value)) / 2 * 100
-    else:
-        chance = -((1 + abs(value)) / 2 * 100)
+    chance = (1 + abs(value)) / 2 * 100
 
-    return f'{chance}%'
+    if value >= 0:
+        return f'{chance}% chance Accreted'
+    else:
+        return f'{chance}% chance In-situ'
 
 classification_perc = classification_values[['Classification_mean']].applymap(convert)
 classification_perc.insert(0, '#NGC', all_classifications_merged['#NGC'])
+print(classification1)
+print(classification2)
+print(classification3)
 print(classification_perc)
-# Now present this data however you like, whether it's just the table or if it's in a plot up to you
-# %%
