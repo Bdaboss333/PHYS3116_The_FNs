@@ -196,18 +196,18 @@ Age_x = totmerge2['Age_x']
 FeH_y = totmerge2['FeH_y']
 Age_y = totmerge2['Age_y']
 
-# Made a plot of Galactocentric radius vs absolute height above the plane of the galaxy, as most of the in situ globular clusters are of decently similar distance, the accreted clusters should be pretty apparent #
-R = np.sqrt(X**2+Y**2)
+# ==== Dynamical Plots of X vs Y Positions and Galactocentric Radius vs |Z| ==== #
 
+# Defining the Galactocentric Radius for the Harris data and finding its standard deviation #
+R = np.sqrt(X**2+Y**2)
 R_std = np.std(R)
 
+# Placing conditions on the Galactocentric Radius vs |Z| plot to colour code by # of standard deviations away from the mean #
 conditions = [R>3*R_std, (R>R_std) & (v_r<3*R_std), R<R_std]
-
 cond_colours = ['purple', 'red', 'green']
-
 point_colours = np.select(conditions, cond_colours, default = 'red')
 
-
+# Plot of Galactocentric Radius vs |Z| #
 plt.scatter(R, abs(Z), c=point_colours, alpha=0.3)
 plt.xlabel("Galactocentric Radius ($R = \sqrt{X^{2}+Y^{2}}$) (kpc)")
 plt.ylabel("Height from Plane (kpc)")
@@ -220,12 +220,12 @@ plt.legend()
 plt.grid(True)
 plt.show()
 
+# Placing conditions on the X vs Y Position plot #
 conditions2 = [(X**2 + Y**2)**0.5 > 10, (X**2 + Y**2)**0.5 <= 10]
-
 cond_colours2 = ['blue', 'green']
-
 point_colours2 = np.select(conditions2, cond_colours2, default = 'gray')
 
+# X vs Y position plot #
 plt.scatter(X,Y,c=point_colours2, alpha=0.3)
 theta = np.linspace(0, 2*np.pi, 500)
 r = 10
@@ -241,13 +241,17 @@ plt.legend()
 plt.grid(True, alpha=0.6)
 plt.show()
 
+# ==== Age vs Metallicity Plots ==== #
+
+# Placing conditions on the Age vs Metallicity plots to colour the points which lie outside the 10kpc certainty area #
 conditions3 = [(x_2**2 + y_2**2)**0.5 > 9.8, (x_2**2 + y_2**2)**0.5 <= 9.8]
-
 cond_colours3 = ['blue', 'green']
-
 point_colours3 = np.select(conditions3, cond_colours3, default = 'gray')
 
+# Age vs Metallicity plot using Krause21 data #
 plt.scatter(FeH_x,Age_x,c=point_colours3,alpha=0.3)
+
+# Labelling each point which lies outside of both the 10kpc certainty area and the uncertainty area on the plot #
 for i, txt in enumerate(ID_h):
     if ((x_2[i]**2 + y_2[i]**2)**0.5 > 9.8) & (FeH_x[i] > -1.75): 
         plt.annotate(txt, (FeH_x[i], Age_x[i]), fontsize=8)
@@ -263,8 +267,10 @@ plt.legend()
 plt.grid(True, alpha=0.6)
 plt.show()
 
-
+# Age vs Metallicity plot using the VandenBerg data #
 plt.scatter(FeH_y,Age_y,c=point_colours3,alpha=0.3)
+
+# Labelling each point which lies outside of the 10kpc certainty area #
 for i, txt in enumerate(ID_h):
     if (x_2[i]**2 + y_2[i]**2)**0.5 > 9.8: 
         plt.annotate(txt, (FeH_y[i], Age_y[i]), fontsize=8)
@@ -276,16 +282,18 @@ plt.legend()
 plt.grid(True, alpha=0.6)
 plt.show()
 
+# Defining the Galactocentric Radius for the totmerge data and finding its standard deviation #
 R_2 = np.sqrt(x_1**2 + y_1**2)
-
 R_2_std = np.std(R_2)
 
+# Set conditions upon the data to color code based on certainty of accretion #
 conditions4 = [(R_2 > 10) & (FeH_x >= -1.75) | (R_2 > 10) & (FeH_y >= -1.75) | (R_2>3*R_2_std), R_2 > 10, R_2 <= 10]
-
 cond_colours4 = ['purple', 'blue', 'green']
-
 point_colours4 = np.select(conditions4, cond_colours4, default = 'gray')
 
+# ==== Final X vs Y Position Plot with Classification Colour Coding ==== #
+
+# X vs Y position plots of the totmerge data with colour coding and a 10kpc certainty area #
 plt.scatter(x_1,y_1,c=point_colours4, alpha=0.3)
 theta = np.linspace(0, 2*np.pi, 500)
 r = 10
@@ -300,12 +308,12 @@ plt.text(-95,22,'# of Possibly Accreted Clusters = 61')
 plt.grid(True, alpha=0.6)
 plt.show()
 
-# Add column to dataset for classification of in-situ or accreted
+# Add column to dataset for classification of in-situ or accreted or unsure #
 totmerge['Classification2'] = 'Placeholder'
 
-# Define functions to determine whether in-situ or accreted
+# Define functions to determine whether in-situ or accreted #
 
-# Categorises whether given GC is accreted, in-situ or unsure
+# Categorises whether given GC is accreted, in-situ or unsure #
 def classify(FeH_x,Age_x,FeH_y,R_2):
     if (R_2 > 9.8) & (FeH_x >= -1.75) | (R_2 > 9.8) & (FeH_y >= -1.75) | (R_2>3*R_2_std):
         return 'Accreted'
@@ -314,13 +322,17 @@ def classify(FeH_x,Age_x,FeH_y,R_2):
     elif (R_2 <= 9.8):
         return 'In-Situ'
 
+# Using an .iloc command to determine classifications using the conditions set above by looking at each indexed row #
 for i in range(len(totmerge['ID'])):
     totmerge['Classification'].iloc[i] = classify(totmerge['FeH_x'].iloc[i],
                                                   totmerge['Age_x'].iloc[i],
                                                   totmerge['FeH_y'].iloc[i],
                                                   R_2.iloc[i])
 
+# Making a new table which mimics the totmerge file but drops every column that isn't 'ID' or 'Classification' to make the data more readable #
 classification2 = totmerge.drop(columns = ['Mstar','rh','C5','Name_x','Name_y','FeH_y','Age_y','Method','Figs','Range','HBtype','R_G','M_V','v_e0','log_sigma_0','Age_x','FeH_x','Age_err','AltName','X','Y','Z','RA','DEC','L','B','R_Sun','R_gc','v_r','v_r_e','v_LSR','sig_v','sig_v_e','c','r_c','r_h','mu_V','rho_0','lg_tc','lg_th'])
+
+# Removes the truncation of the data in terminal so I can read it #
 pd.set_option('display.max_rows', None)
 pd.set_option('display.max_columns', None)
 print(classification2)
