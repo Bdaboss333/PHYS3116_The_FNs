@@ -330,6 +330,69 @@ classification2['#NGC'] = classification2['#NGC'].str.replace("Pal", "Palomar")
 pd.set_option('display.max_rows', None)
 pd.set_option('display.max_columns', None)
 print(classification2)
+# %% Classification Method 3 (Brandon)
+
+## FINAL TEST
+# For my analysis, I want to observe the distribution of the glocbular clusters, classfying them against their metallicites, luminosity, and HB type
+# The following will predominately analyse the Vandenberg data set
+
+# ----- Importing packages and defining variables ----- #
+import matplotlib.pyplot as plt
+import pandas as pd
+import numpy as np
+import astropy.io
+
+totmerge2 = pd.read_csv('totmerge2.csv')
+harris_p1 = pd.read_csv('HarrisPartI.csv')
+harris_p3 = pd.read_csv('HarrisPartIII.csv')
+krause = pd.read_csv('Krause21.csv')
+vandenberg = pd.read_csv('vandenBerg_table2.csv')
+
+
+# Defining variables
+FeH=vandenberg['FeH']
+lum=vandenberg['M_V']
+HB=vandenberg['HBtype']
+ID=vandenberg['#NGC']
+
+# Defining conditions based on academic papers and resources
+# In-situ GC's tend to be metal-rich, redder, and brighter compared to accreted GC's.
+# Under this assumption, we can define the following function to classify the Vandenberg clusters into "In-situ", "Accreted", or "unsure"
+
+
+def classify(FeH, lum, HB):
+    condFeH_poor  = FeH < -1
+    condFeH_rich  = FeH >= -1
+    condLum_high  = lum < -9
+    condLum_norm  = (lum >= -9) & (lum < -6.5)
+    condLum_faint = lum >= -6.5
+    condHB_blue   = HB > 0.5
+    condHB_mixed  = (HB >= -0.2) & (HB <= 0.5)
+    condHB_red    = HB < -0.2
+    if (condFeH_rich & condLum_high & condHB_red) or (condFeH_poor & condLum_high & condHB_red) or (condFeH_rich & condLum_norm & condHB_red) or (condFeH_rich & condLum_high & condHB_mixed):
+        return 'In-situ'
+    elif (condFeH_poor & condLum_faint & condHB_blue) or (condFeH_rich & condLum_faint & condHB_blue) or (condFeH_poor & condLum_norm & condHB_blue) or (condFeH_poor & condLum_faint & condHB_mixed): 
+        return 'Accreted'
+    elif (condFeH_poor & condLum_high & condHB_blue) or (condFeH_rich & condLum_faint & condHB_red) or (condFeH_poor & condLum_norm & condHB_mixed) or (condFeH_rich & condLum_norm & condHB_mixed):
+        return 'Unsure'
+
+# Classifying each Globular Cluster
+vandenberg['Classification'] = 'Placeholder'
+
+for i in range(len(ID)):
+    vandenberg['Classification'].iloc[i] = classify(FeH.iloc[i],
+                                                  lum.iloc[i],
+                                                  HB.iloc[i],
+                                                  )
+    
+# Making a new table which mimics the totmerge file but drops every column that isn't 'ID' or 'Classification' to make the data more readable #
+classification3 = vandenberg.drop(columns = ['Name','FeH','Age','Age_err','Method','Figs','Range','HBtype','R_G','M_V','v_e0','log_sigma_0'])
+
+
+# Removes the truncation of the data in terminal so I can read it #
+pd.set_option('display.max_rows', None)
+pd.set_option('display.max_columns', None)
+print(classification3)
 print(classification1)
 # %% Classification Method 3
 
@@ -349,20 +412,15 @@ import matplotlib.pyplot as plt
 # Start by merging our 3 classification results tables
 
 # 2_classifications_merged = pd.merge(classification1,classification2,on='#NGC')
-
-classifications_merged2 = pd.merge(classification1,classification2,on='#NGC')
+classifications_merged2 = pd.merge(classification2,classification1,on='#NGC', how='left')
 print(classifications_merged2)
 
 # Then merge this with last classification
 
 # all_classifications_merged = pd.merge(2_classifications_merged,classification3,on='#NGC)
-
-
-# pd.merge merges tables but only includes things in #NGC column which are column across the
-# tables being merged, so to include the unique gcs that were missed by merge do this
-
-# classifications_w_unique = pd.concat([all_classifications_merged,classification1,classification2,classification3])
-# classifications_complete = classifications.drop_duplicates(subset=['#NGC'])
+# this almost work but I had to include a left merge to kee
+all_classifications_merged = pd.merge(classifications_merged2,classification3,on='#NGC', how='left')
+print(all_classifications_merged)
 
 # Now we have finalised table, which should have a column with ngcs/id, then three columns named
 # like Classification 1, Classification 2, etc. for classifactions 1 2 and 3, which are either 'Unsure', 
@@ -381,17 +439,24 @@ def assign_value(classification):
     
 # Then do the following to make copy of above table with classifications replaced with value from function
 
-# classification_values = classifications_complete['Classifcation 1':'Classification 3'].apply(assign_value)
+# classification_values = all_classifications_merged[['Classification 1':'Classification 3']].applymap(assign_value)
+classification_values = all_classifications_merged[['Classification_x', 'Classification_y', 'Classification']].applymap(assign_value)
+classification_values.insert(0, '#NGC', all_classifications_merged['#NGC'])
+print(classification_values)
 
 # If this doesn't work try this
 
-# classification_values = classifications_complete['Classifcation 1','Classificatoin 2','Classification 3'].apply(assign_value)
+# classification_values = classifications_complete['Classification 1','Classificatoin 2','Classification 3'].applymap(assign_value)
 
 # Now we should have table with ngc column and three columns with either 1, -1 or 0
 # Now take the mean across these columns to find the average value which we can use to determine our confidence in
 # our classification, as follows
 
 # classification_values['Classification 1':'Classification 3'] = np.mean(classification_values['Classification 1':'Classification 3'],axis=1)
+# That didn't work so I had to try something else seen below
+classification_cols = ['Classification_x', 'Classification_y', 'Classification']
+classification_values['Classification_mean'] = classification_values[classification_cols].mean(axis=1)
+print(classification_values)
 
 # Again this might not work, if so let me know and I'm happy to debug
 
@@ -411,5 +476,8 @@ def convert(value):
 
     return f'{chance}%'
 
+classification_perc = classification_values[['Classification_mean']].applymap(convert)
+classification_perc.insert(0, '#NGC', all_classifications_merged['#NGC'])
+print(classification_perc)
 # Now present this data however you like, whether it's just the table or if it's in a plot up to you
 # %%
