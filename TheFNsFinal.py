@@ -11,12 +11,6 @@ import math
 
 # %% Classification method 1 (Billy)
 
-# Import libraries
-import matplotlib.pyplot as plt
-import pandas as pd
-import numpy as np
-import math
-
 # Read Krause and vandenBerg csv files
 krause = pd.read_csv('Krause21.csv')
 vandenberg = pd.read_csv('vandenBerg_table2.csv')
@@ -156,12 +150,7 @@ print(classification1)
 
 # %% Classification Method 2 (Saxon)
 
-# ===== Import packages and define variables ==== #
-
-import pandas as pd
-import numpy as np
-import matplotlib.pyplot as plt
-
+# Read csv files
 harris_p1 = pd.read_csv('HarrisPartI.csv')
 harris_p3 = pd.read_csv('HarrisPartIII.csv')
 krause = pd.read_csv('Krause21_fixed.csv')
