@@ -333,6 +333,8 @@ classification = totmerge.drop(columns = ['Mstar','rh','C5','Name_x','Name_y','F
 
 # Renaming the 'ID' column to '#NGC' to match with Billy's data for easy merging # 
 classification2 = classification.rename(columns={'ID': '#NGC'})
+classification2['#NGC'] = classification2['#NGC'].str.replace(" ", "")
+classification2['#NGC'] = classification2['#NGC'].str.replace("Pal", "Palomar")
 
 # Removes the truncation of the data in terminal so I can read it #
 pd.set_option('display.max_rows', None)
