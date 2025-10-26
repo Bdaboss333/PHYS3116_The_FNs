@@ -108,7 +108,7 @@ vandenberg = pd.read_csv('vandenBerg_table2.csv')
 FeH=vandenberg['FeH']
 lum=vandenberg['M_V']
 HB=vandenberg['HBtype']
-ID=vandenberg['ID']
+ID=vandenberg['#NGC']
 
 # Defining conditions based on academic papers and resources
 # In-situ GC's tend to be metal-rich, redder, and brighter compared to accreted GC's.
@@ -125,23 +125,43 @@ condHB_mixed  = (HB >= -0.2) & (HB <= 0.5)
 condHB_red    = HB < -0.2
 
 def classify(FeH, lum, HB):
-    if (condFeH_rich | condLum_high | condHB_red) or (condFeH_poor | condLum_high | condHB_red) or (condFeH_rich | condLum_norm | condHB_red) or (condFeH_rich | condLum_high | condHB_mixed):
+    if (condFeH_rich) & (condLum_high) & (condHB_red):
         return 'In-situ'
-    elif (condFeH_poor | condLum_faint | condHB_blue) or (condFeH_rich | condLum_faint | condHB_blue) or (condFeH_poor | condLum_norm | condHB_blue) or (condFeH_poor | condLum_faint | condHB_mixed): 
+    elif (condFeH_poor) & (condLum_high) & (condHB_red): 
+        return 'In-situ'
+    elif (condFeH_rich) & (condLum_norm) & (condHB_red):
+        return 'In-situ'
+    elif (condFeH_rich) & (condLum_high) & (condHB_mixed):
+        return 'In-situ'
+    elif (condFeH_poor) & (condLum_faint) & (condHB_blue): 
         return 'Accreted'
-    elif (condFeH_poor | condLum_high | condHB_blue) or (condFeH_rich | condLum_faint | condHB_red) or (condFeH_poor | condLum_norm | condHB_mixed) or (condFeH_rich | condLum_norm | condHB_mixed):
+    elif (condFeH_rich) & (condLum_faint) & (condHB_blue):
+        return 'Accreted'
+    elif (condFeH_poor) & (condLum_norm) &  (condHB_blue):
+        return 'Accreted'
+    elif (condFeH_poor) & (condLum_faint) & (condHB_mixed):
+        return 'Accreted'
+    elif (condFeH_poor) & (condLum_high) & (condHB_blue):
+        return 'Unsure'
+    elif (condFeH_rich) & (condLum_faint) & (condHB_red):
+        return 'Unsure'
+    elif (condFeH_poor) & (condLum_norm) & (condHB_mixed):
+        return 'Unsure'
+    elif (condFeH_rich) & (condLum_norm) & (condHB_mixed):
         return 'Unsure'
 
 # Classifying each Globular Cluster
 vandenberg['Classification'] = 'Placeholder'
 
-for i in range(len(ID)):
-    vandenberg['Classification'].iloc[i] = classify(FeH.iloc[i],
-                                                  lum.iloc[i],
-                                                  HB.iloc[i],
-                                                  )
+for i in range(len('#NGC')):
+    FeH_val = vandenberg.loc[i, 'FeH']
+    lum_val = vandenberg.loc[i, 'M_V']
+    HB_val  = vandenberg.loc[i, 'HBtype']
+    vandenberg.loc[i, 'Classification'] = classify(FeH, lum, HB)
+
+
+# Making a 3D plot colour-coded based off the classfication to observe the distribution of globular clusters in the Milky way 
+ 
+
 
     
-
-
-
