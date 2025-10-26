@@ -278,7 +278,6 @@ plt.xlabel('[Fe/H]')
 plt.ylabel('Age (Gyr)')
 plt.title('Age vs Metallicity Plot of vandenBerg Clusters')
 plt.text(-2.35,9.5,'# of Possibly Accreted Clusters = 13')
-plt.legend()
 plt.grid(True, alpha=0.6)
 plt.show()
 
