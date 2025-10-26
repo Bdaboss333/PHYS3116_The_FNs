@@ -151,13 +151,13 @@ def classify(FeH, lum, HB):
         return 'Unsure'
 
 # Classifying each Globular Cluster
-vandenberg['Classification'] = 'Placeholder'
+vandenberg['Classification'] = vandenberg.apply(
+    lambda r: classify(r['FeH'], r['M_V'], r['HBtype']),
+    axis=1
+)
 
-for i in range(len('#NGC')):
-    FeH_val = vandenberg.loc[i, 'FeH']
-    lum_val = vandenberg.loc[i, 'M_V']
-    HB_val  = vandenberg.loc[i, 'HBtype']
-    vandenberg.loc[i, 'Classification'] = classify(FeH, lum, HB)
+# --- (Optional) Verify result ---
+print(vandenberg[['ID', 'FeH', 'M_V', 'HBtype', 'Classification']].head())
 
 
 # Making a 3D plot colour-coded based off the classfication to observe the distribution of globular clusters in the Milky way 
