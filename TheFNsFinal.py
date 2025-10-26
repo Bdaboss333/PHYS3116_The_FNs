@@ -146,7 +146,8 @@ classification1 = k_and_v_results.drop(columns = ['Age_x','FeH_x','Age_err','Cla
 
 # Show results
 plt.show()
-print(classification1)
+pd.set_option('display.max_rows', None,'display.max_columns',None)
+
 
 # %% Classification Method 2 (Saxon)
 
@@ -329,6 +330,7 @@ classification2['#NGC'] = classification2['#NGC'].str.replace("Pal", "Palomar")
 pd.set_option('display.max_rows', None)
 pd.set_option('display.max_columns', None)
 print(classification2)
+print(classification1)
 # %% Classification Method 3
 
 
