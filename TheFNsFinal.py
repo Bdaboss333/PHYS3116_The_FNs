@@ -8,6 +8,7 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import numpy as np
 import math
+import matplotlib.colors as clrs
 
 # %% Classification method 1 (Billy)
 
@@ -145,7 +146,7 @@ plt.legend()
 classification1 = k_and_v_results.drop(columns = ['Age_x','FeH_x','Age_err','Class','AltName'])
 
 # Show results
-plt.show()
+# plt.show()
 
 # %% Classification Method 2 (Saxon)
 
@@ -196,6 +197,7 @@ cond_colours = ['purple', 'red', 'green']
 point_colours = np.select(conditions, cond_colours, default = 'red')
 
 # Plot of Galactocentric Radius vs |Z| #
+plt.figure(3)
 plt.scatter(R, abs(Z), c=point_colours, alpha=0.3)
 plt.xlabel("Galactocentric Radius ($R = \sqrt{X^{2}+Y^{2}}$) (kpc)")
 plt.ylabel("Height from Plane (kpc)")
@@ -206,7 +208,7 @@ plt.xlim(left=0.1,right=100)
 plt.text(25,70,'# of Possibly Accreted Clusters = 61')
 plt.legend()
 plt.grid(True)
-plt.show()
+# plt.show()
 
 # Placing conditions on the X vs Y Position plot #
 conditions2 = [(X**2 + Y**2)**0.5 > 10, (X**2 + Y**2)**0.5 <= 10]
@@ -214,6 +216,7 @@ cond_colours2 = ['blue', 'green']
 point_colours2 = np.select(conditions2, cond_colours2, default = 'gray')
 
 # X vs Y position plot #
+plt.figure(4)
 plt.scatter(X,Y,c=point_colours2, alpha=0.3)
 theta = np.linspace(0, 2*np.pi, 500)
 r = 10
@@ -227,7 +230,7 @@ plt.title('Galactic Coordinates X vs Y')
 plt.text(-95,22,'# of Possibly Accreted Clusters = 61')
 plt.legend()
 plt.grid(True, alpha=0.6)
-plt.show()
+# plt.show()
 
 # ==== Age vs Metallicity Plots ==== #
 
@@ -237,6 +240,7 @@ cond_colours3 = ['blue', 'green']
 point_colours3 = np.select(conditions3, cond_colours3, default = 'gray')
 
 # Age vs Metallicity plot using Krause21 data #
+plt.figure(5)
 plt.scatter(FeH_x,Age_x,c=point_colours3,alpha=0.3)
 
 # Labelling each point which lies outside of both the 10kpc certainty area and the uncertainty area on the plot #
@@ -253,9 +257,10 @@ plt.title('Age vs Metallicity Plot of Krause21 Clusters')
 plt.text(-2.35,8.5,'# of Possibly Accreted Clusters = 19')
 plt.legend()
 plt.grid(True, alpha=0.6)
-plt.show()
+# plt.show()
 
 # Age vs Metallicity plot using the VandenBerg data #
+plt.figure(6)
 plt.scatter(FeH_y,Age_y,c=point_colours3,alpha=0.3)
 
 # Labelling each point which lies outside of the 10kpc certainty area #
@@ -267,7 +272,7 @@ plt.ylabel('Age (Gyr)')
 plt.title('Age vs Metallicity Plot of vandenBerg Clusters')
 plt.text(-2.35,9.5,'# of Possibly Accreted Clusters = 13')
 plt.grid(True, alpha=0.6)
-plt.show()
+# plt.show()
 
 # Defining the Galactocentric Radius for the totmerge data and finding its standard deviation #
 R_2 = np.sqrt(x_1**2 + y_1**2)
@@ -281,6 +286,7 @@ point_colours4 = np.select(conditions4, cond_colours4, default = 'gray')
 # ==== Final X vs Y Position Plot with Classification Colour Coding ==== #
 
 # X vs Y position plots of the totmerge data with colour coding and a 10kpc certainty area #
+plt.figure(7)
 plt.scatter(x_1,y_1,c=point_colours4, alpha=0.3)
 theta = np.linspace(0, 2*np.pi, 500)
 r = 10
@@ -293,7 +299,7 @@ plt.ylabel('Galactic Coordinate Y (kpc)')
 plt.title('Galactic Coordinates X vs Y')
 plt.text(-95,22,'# of Possibly Accreted Clusters = 61')
 plt.grid(True, alpha=0.6)
-plt.show()
+# plt.show()
 
 # Add column to dataset for classification of in-situ or accreted or unsure #
 totmerge['Classification'] = 'Placeholder'
@@ -327,7 +333,6 @@ classification2['#NGC'] = classification2['#NGC'].str.replace("Pal", "Palomar")
 # Removes the truncation of the data in terminal so I can read it #
 pd.set_option('display.max_rows', None)
 pd.set_option('display.max_columns', None)
-print(classification2)
 # %% Classification Method 3 (Brandon)
 
 ## FINAL TEST
@@ -366,6 +371,8 @@ def classify3(FeH, lum, HB):
     elif (condFeH_poor & condLum_faint & condHB_blue) or (condFeH_rich & condLum_faint & condHB_blue) or (condFeH_poor & condLum_norm & condHB_blue) or (condFeH_poor & condLum_faint & condHB_mixed): 
         return 'Accreted'
     elif (condFeH_poor & condLum_high & condHB_blue) or (condFeH_rich & condLum_faint & condHB_red) or (condFeH_poor & condLum_norm & condHB_mixed) or (condFeH_rich & condLum_norm & condHB_mixed):
+        return 'Unsure'
+    else:
         return 'Unsure'
 
 # Classifying each Globular Cluster
@@ -431,6 +438,29 @@ def convert(value):
 
 classification_perc = classification_values[['Classification_mean']].applymap(convert)
 classification_perc.insert(0, '#NGC', all_classifications_merged['#NGC'])
+
+# Create 3d plot of locations in space coloured by percentaged chance of accreted or insitu
+
+# Set up colour gradient
+norm = clrs.Normalize(vmin=-1, vmax=1)
+cmap = plt.get_cmap('bwr')
+
+# Map probabilities to colours
+colours = cmap(norm(classification_values['Classification_mean']))
+
+
+plt.figure()
+ax = plt.axes(projection='3d')
+# Made data point outlines black to see some of the colourmapped points easier #
+ax.scatter(totmerge['X'],totmerge['Y'],totmerge['Z'],c=colours,edgecolors='black')
+cbar = plt.colorbar(plt.cm.ScalarMappable(norm=norm, cmap=cmap), ax=ax)
+cbar.set_label('Accretion Probability\n(-1 = In-Situ, +1 = Accreted)')
+ax.set_xlabel('X')
+ax.set_ylabel('Y')
+ax.set_zlabel('Z')
+# ax.view_init(elev=90,azim=90,roll=0)
+plt.show()
+
 print(classification1)
 print(classification2)
 print(classification3)
