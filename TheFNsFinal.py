@@ -309,7 +309,7 @@ plt.grid(True, alpha=0.6)
 plt.show()
 
 # Add column to dataset for classification of in-situ or accreted or unsure #
-totmerge['Classification2'] = 'Placeholder'
+totmerge['Classification'] = 'Placeholder'
 
 # Define functions to determine whether in-situ or accreted #
 
@@ -330,7 +330,10 @@ for i in range(len(totmerge['ID'])):
                                                   R_2.iloc[i])
 
 # Making a new table which mimics the totmerge file but drops every column that isn't 'ID' or 'Classification' to make the data more readable #
-classification2 = totmerge.drop(columns = ['Mstar','rh','C5','Name_x','Name_y','FeH_y','Age_y','Method','Figs','Range','HBtype','R_G','M_V','v_e0','log_sigma_0','Age_x','FeH_x','Age_err','AltName','X','Y','Z','RA','DEC','L','B','R_Sun','R_gc','v_r','v_r_e','v_LSR','sig_v','sig_v_e','c','r_c','r_h','mu_V','rho_0','lg_tc','lg_th'])
+classification = totmerge.drop(columns = ['Mstar','rh','C5','Name_x','Name_y','FeH_y','Age_y','Method','Figs','Range','HBtype','R_G','M_V','v_e0','log_sigma_0','Age_x','FeH_x','Age_err','AltName','X','Y','Z','RA','DEC','L','B','R_Sun','R_gc','v_r','v_r_e','v_LSR','sig_v','sig_v_e','c','r_c','r_h','mu_V','rho_0','lg_tc','lg_th'])
+
+# Renaming the 'ID' column to '#NGC' to match with Billy's data for easy merging # 
+classification2 = classification.rename(columns={'ID': '#NGC'})
 
 # Removes the truncation of the data in terminal so I can read it #
 pd.set_option('display.max_rows', None)
@@ -342,12 +345,21 @@ print(classification2)
 
 # %% Merging conditions to determine confidence in classifications
 
+# ===== Import packages ==== #
+
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+
 # To merge, make sure all our tables have same column name for ngc/id and
 # that all gcs have same naming convention, then do following
 
 # Start by merging our 3 classification results tables
 
 # 2_classifications_merged = pd.merge(classification1,classification2,on='#NGC')
+
+classifications_merged2 = pd.merge(classification1,classification2,on='#NGC')
+print(classifications_merged2)
 
 # Then merge this with last classification
 
@@ -397,3 +409,4 @@ def assign_value(classification):
 # because we assigned in-situ as negative and accreted as positive
 
 # Now present this data however you like, whether it's just the table or if it's in a plot up to you
+# %%
