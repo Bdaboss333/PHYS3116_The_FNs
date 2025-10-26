@@ -333,6 +333,7 @@ classification2['#NGC'] = classification2['#NGC'].str.replace("Pal", "Palomar")
 # Removes the truncation of the data in terminal so I can read it #
 pd.set_option('display.max_rows', None)
 pd.set_option('display.max_columns', None)
+
 # %% Classification Method 3 (Brandon)
 
 ## FINAL TEST
@@ -387,16 +388,6 @@ for i in range(len(ID)):
 # Making a new table which mimics the totmerge file but drops every column that isn't 'ID' or 'Classification' to make the data more readable #
 classification3 = vandenberg.drop(columns = ['Name','FeH','Age','Age_err','Method','Figs','Range','HBtype','R_G','M_V','v_e0','log_sigma_0'])
 
-
-# Removes the truncation of the data in terminal so I can read it #
-pd.set_option('display.max_rows', None)
-pd.set_option('display.max_columns', None)
-
-
-# %% Classification Method 3
-
-
-
 # %% Merging conditions to determine confidence in classifications
 
 # Start by merging our 3 classification results tables
@@ -432,9 +423,9 @@ def convert(value):
     chance = (1 + abs(value)) / 2 * 100
 
     if value >= 0:
-        return f'{chance}% chance Accreted'
+        return f'{round(chance,2)}% chance Accreted'
     else:
-        return f'{chance}% chance In-situ'
+        return f'{round(chance,2)}% chance In-situ'
 
 classification_perc = classification_values[['Classification_mean']].applymap(convert)
 classification_perc.insert(0, '#NGC', all_classifications_merged['#NGC'])
