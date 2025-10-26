@@ -124,41 +124,89 @@ condHB_blue   = HB > 0.5
 condHB_mixed  = (HB >= -0.2) & (HB <= 0.5)
 condHB_red    = HB < -0.2
 
-def classify(FeH, lum, HB):
-    if (condFeH_rich) & (condLum_high) & (condHB_red):
+def classify3(FeH, lum, HB):
+    condFeH_poor  = FeH < -1
+    condFeH_rich  = FeH >= -1
+    condLum_high  = lum < -9
+    condLum_norm  = (lum >= -9) & (lum < -6.5)
+    condLum_faint = lum >= -6.5
+    condHB_blue   = HB > 0.5
+    condHB_mixed  = (HB >= -0.2) & (HB <= 0.5)
+    condHB_red    = HB < -0.2
+    if (condFeH_rich & condLum_high & condHB_red) or (condFeH_poor & condLum_high & condHB_red) or (condFeH_rich & condLum_norm & condHB_red) or (condFeH_rich & condLum_high & condHB_mixed):
         return 'In-situ'
-    elif (condFeH_poor) & (condLum_high) & (condHB_red): 
-        return 'In-situ'
-    elif (condFeH_rich) & (condLum_norm) & (condHB_red):
-        return 'In-situ'
-    elif (condFeH_rich) & (condLum_high) & (condHB_mixed):
-        return 'In-situ'
-    elif (condFeH_poor) & (condLum_faint) & (condHB_blue): 
+    elif (condFeH_poor & condLum_faint & condHB_blue) or (condFeH_rich & condLum_faint & condHB_blue) or (condFeH_poor & condLum_norm & condHB_blue) or (condFeH_poor & condLum_faint & condHB_mixed): 
         return 'Accreted'
-    elif (condFeH_rich) & (condLum_faint) & (condHB_blue):
-        return 'Accreted'
-    elif (condFeH_poor) & (condLum_norm) &  (condHB_blue):
-        return 'Accreted'
-    elif (condFeH_poor) & (condLum_faint) & (condHB_mixed):
-        return 'Accreted'
-    elif (condFeH_poor) & (condLum_high) & (condHB_blue):
-        return 'Unsure'
-    elif (condFeH_rich) & (condLum_faint) & (condHB_red):
-        return 'Unsure'
-    elif (condFeH_poor) & (condLum_norm) & (condHB_mixed):
-        return 'Unsure'
-    elif (condFeH_rich) & (condLum_norm) & (condHB_mixed):
+    elif (condFeH_poor & condLum_high & condHB_blue) or (condFeH_rich & condLum_faint & condHB_red) or (condFeH_poor & condLum_norm & condHB_mixed) or (condFeH_rich & condLum_norm & condHB_mixed):
         return 'Unsure'
 
 # Classifying each Globular Cluster
-vandenberg['Classification'] = vandenberg.apply(
-    lambda r: classify(r['FeH'], r['M_V'], r['HBtype']),
-    axis=1
-)
+vandenberg['Classification'] = 'Placeholder'
 
-# --- (Optional) Verify result ---
-print(vandenberg[['ID', 'FeH', 'M_V', 'HBtype', 'Classification']].head())
+for i in range(len(ID)):
+    vandenberg['Classification'].iloc[i] = classify3(FeH.iloc[i],
+                                                  lum.iloc[i],
+                                                  HB.iloc[i],
+                                                  )
+    
+# Making a new table which mimics the totmerge file but drops every column that isn't 'ID' or 'Classification' to make the data more readable #
+classification3 = vandenberg.drop(columns = ['Name','FeH','Age','Age_err','Method','Figs','Range','HBtype','R_G','M_V','v_e0','log_sigma_0'])
 
+
+# Removes the truncation of the data in terminal so I can read it #
+pd.set_option('display.max_rows', None)
+pd.set_option('display.max_columns', None)
+
+
+# %% Classification Method 3
+
+
+
+# %% Merging conditions to determine confidence in classifications
+
+# Start by merging our 3 classification results tables
+classifications_merged2 = pd.merge(classification2,classification1,on='#NGC', how='left')
+
+# Then merge this with last classification
+all_classifications_merged = pd.merge(classifications_merged2,classification3,on='#NGC', how='left')
+
+# Now we have finalised table, which should have a column with ngcs/id, then three columns named
+# like Classification 1, Classification 2, etc. for classifactions 1 2 and 3, which are either 'Unsure', 
+# 'In-situ' or 'Accreted'
+
+# Then from this, use following function with .apply() to assign either -1 to in-situ, 0 to unsure and 1 to accreted
+
+def assign_value(classification):
+
+    if classification == 'In-situ':
+        return -1
+    elif classification == 'Accreted':
+        return 1
+    else:
+        return 0
+    
+# Then do the following to make copy of above table with classifications replaced with value from function
+classification_values = all_classifications_merged[['Classification_x', 'Classification_y', 'Classification']].applymap(assign_value)
+classification_values.insert(0, '#NGC', all_classifications_merged['#NGC'])
+
+classification_cols = ['Classification_x', 'Classification_y', 'Classification']
+classification_values['Classification_mean'] = classification_values[classification_cols].mean(axis=1)
+
+def convert(value):
+
+    chance = (1 + abs(value)) / 2 * 100
+
+    if value >= 0:
+        return f'{chance}% chance Accreted'
+    else:
+        return f'{chance}% chance In-situ'
+
+classification_perc = classification_values[['Classification_mean']].applymap(convert)
+classification_perc.insert(0, '#NGC', all_classifications_merged['#NGC'])
+print(classification1)
+print(classification2)
+print(classification3)
+print(classification_perc)
 
 # Making a 3D plot colour-coded based off the classfication to observe the distribution of globular clusters in the Milky way 
  
