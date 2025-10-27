@@ -360,13 +360,13 @@ ID=vandenberg['#NGC']
 
 def classify3(FeH, lum, HB):
     condFeH_poor  = FeH < -1
-    condFeH_rich  = FeH >= -1
-    condLum_high  = lum < -9
-    condLum_norm  = (lum >= -9) & (lum < -6.5)
+    condFeH_rich  = FeH >= -0.8
+    condLum_high  = lum < -8
+    condLum_norm  = (lum >= -8) & (lum < -6.5)
     condLum_faint = lum >= -6.5
     condHB_blue   = HB > 0.5
-    condHB_mixed  = (HB >= -0.2) & (HB <= 0.5)
-    condHB_red    = HB < -0.2
+    condHB_mixed  = (HB >= -0.3) & (HB <= 0.5)
+    condHB_red    = HB < -0.3
     if (condFeH_rich & condLum_high & condHB_red) or (condFeH_poor & condLum_high & condHB_red) or (condFeH_rich & condLum_norm & condHB_red) or (condFeH_rich & condLum_high & condHB_mixed):
         return 'In-situ'
     elif (condFeH_poor & condLum_faint & condHB_blue) or (condFeH_rich & condLum_faint & condHB_blue) or (condFeH_poor & condLum_norm & condHB_blue) or (condFeH_poor & condLum_faint & condHB_mixed): 
