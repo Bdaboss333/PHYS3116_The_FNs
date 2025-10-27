@@ -428,6 +428,7 @@ def convert(value):
         return f'{round(chance,2)}% chance In-situ'
 
 classification_perc = classification_values[['Classification_mean']].applymap(convert)
+classification_perc.rename(columns={'Classification_mean': 'Classification Probability'}, inplace=True)
 classification_perc.insert(0, '#NGC', all_classifications_merged['#NGC'])
 
 # Create 3d plot of locations in space coloured by percentaged chance of accreted or insitu
