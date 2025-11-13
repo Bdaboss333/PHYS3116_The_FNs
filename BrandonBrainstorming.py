@@ -39,7 +39,7 @@ sorted_met=sorted(met)
 print(sorted_met)
 
 # Scatter plot of the age vs metallicity from merged cluster data but adding colour to represent distance from galactic centre#
-r=np.sqrt(totmerge2['X']**2 + totmerge2['Y']**2 + totmerge2['Z']**2)
+r=totmerge2['R_gc']
 cond1=r<20
 cond2=r>=20
 
@@ -60,3 +60,51 @@ plt.ylabel("Metallicity of merged Clusters (FeH)")
 plt.title("Age vs Metallicity of the merged Globular Clusters w/ colour-coded radial distance")
 plt.legend()
 plt.show()
+
+# Trying another plot 'Velocity dispersion VS Metallicity'
+FeH = totmerge2['FeH_x']
+ID = totmerge2['ID']
+sigma_v=totmerge2['sig_v']
+
+plt.scatter(FeH, sigma_v, c='goldenrod')
+
+for i, txt in enumerate(ID):
+    plt.annotate(txt, (FeH[i], sigma_v[i]), fontsize=8)
+
+plt.xlabel("Metallicity")
+plt.ylabel("Velocity dispersion")
+plt.title("Velocity dispersion VS Metallicity")
+plt.show()
+
+# Code from ChatGPT just to see if anything changes between my code and its code #
+# boolean masks
+r = pd.to_numeric(totmerge2['R_gc'], errors='coerce')
+mask_in  = r < 10
+mask_out = r >= 10
+
+# filtered tables (drop missing values if any)
+cols = ['ID', 'Age_x', 'FeH_x']
+df_in  = totmerge2.loc[mask_in,  cols].dropna()
+df_out = totmerge2.loc[mask_out, cols].dropna()
+
+# arrays for plotting/annotating
+ID1, Age1, FeH1 = df_in['ID'].to_numpy(),  df_in['Age_x'].to_numpy(),  df_in['FeH_x'].to_numpy()
+ID2, Age2, FeH2 = df_out['ID'].to_numpy(), df_out['Age_x'].to_numpy(), df_out['FeH_x'].to_numpy()
+
+# scatter
+plt.scatter(Age1, FeH1, color='#0072B2', label='R_gc < 10 kpc')
+plt.scatter(Age2, FeH2, color='#D55E00', label='R_gc ≥ 10 kpc')
+
+# annotations (zip avoids index/key errors)
+for name, x, y in zip(ID1, Age1, FeH1):
+    plt.annotate(name, (x, y), fontsize=8)
+for name, x, y in zip(ID2, Age2, FeH2):
+    plt.annotate(name, (x, y), fontsize=8)
+
+plt.xlabel('Age (Gyr)')
+plt.ylabel('[Fe/H]')
+plt.legend()
+plt.tight_layout()
+plt.show()
+
+# Note: Did not change anything by the looks of it
